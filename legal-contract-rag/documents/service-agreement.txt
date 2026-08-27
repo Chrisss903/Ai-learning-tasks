@@ -1,0 +1,50 @@
+SAMPLE SERVICE AGREEMENT
+For RAG Training Purposes Only
+
+Agreement ID: SA-2026-001
+
+1. PARTIES
+
+This Service Agreement is entered into between AlphaTech Solutions
+and BetaWorks Pvt. Ltd.
+
+2. EFFECTIVE DATE
+
+This agreement becomes effective on August 1, 2026.
+
+3. CONTRACT TERM
+
+The agreement will remain valid for a period of three years
+from the effective date.
+
+4. SERVICE DESCRIPTION
+
+AlphaTech Solutions will provide software development,
+maintenance, and technical support services to BetaWorks Pvt. Ltd.
+
+5. TERMINATION
+
+Either party may terminate this agreement by providing
+30 days written notice to the other party.
+
+6. CONFIDENTIALITY
+
+Both parties agree to protect confidential business,
+technical, and financial information shared during the
+term of the agreement.
+
+7. INTELLECTUAL PROPERTY
+
+Any software specifically developed for BetaWorks Pvt. Ltd.
+under this agreement will belong to BetaWorks Pvt. Ltd.
+after all applicable payments have been completed.
+
+8. GOVERNING LAW
+
+This agreement shall be governed by the applicable laws
+of India.
+
+9. GENERAL TERMS
+
+Any changes to this agreement must be made through a
+written amendment approved by both parties.

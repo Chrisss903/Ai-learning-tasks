@@ -1,0 +1,37 @@
+SAMPLE CONTRACT AMENDMENT
+For RAG Training Purposes Only
+
+Amendment ID: AMD-2026-001
+
+1. PURPOSE
+
+This amendment modifies specific provisions of the
+Service Agreement SA-2026-001.
+
+2. TERMINATION NOTICE
+
+Section 5 of the original Service Agreement is hereby
+amended.
+
+The original termination notice period of 30 days is
+replaced with a termination notice period of 60 days.
+
+The updated requirement is therefore:
+
+Either party must provide 60 days written notice
+before terminating the agreement.
+
+3. EFFECTIVE DATE OF AMENDMENT
+
+This amendment becomes effective on October 1, 2026.
+
+4. OTHER TERMS
+
+All other provisions of the original Service Agreement
+remain unchanged and continue to remain in effect.
+
+5. PRIORITY
+
+If there is a conflict between this amendment and the
+original Service Agreement regarding the termination
+notice period, this amendment shall take precedence.
