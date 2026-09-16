@@ -1,59 +1,37 @@
-import { promises as fs } from "fs";
-import path from "path";
 import { qdrant } from "./qdrant";
-import { createEmbedding } from "./embeddings";
+import { createEmbeddings } from "./embeddings";
+import { loadChunks } from "./chunking";
+import { createCollection } from "./qdarnt-collections";
 
 const COLLECTION_NAME = "legal_documents";
-const DOCUMENTS_DIR = path.join(process.cwd(), "documents");
-
-interface Chunk {
-  text: string;
-  source: string;
-  section: string;
-}
-
-function chunkDocument(text: string, source: string): Chunk[] {
-  const parts = text.split(/\n\s*\n(?=\d+\.\s)/);
-
-  return parts
-    .map((part) => part.trim())
-    .filter((part) => part.length > 0)
-    .map((part) => ({
-      text: part,
-      source,
-      section: part.split("\n")[0].trim(),
-    }));
-}
 
 export async function ingestDocuments() {
-  const files = (await fs.readdir(DOCUMENTS_DIR)).filter((file) =>
-    file.endsWith(".txt"),
-  );
+  // Recreates the collection if the embedding provider changed its size.
+  await createCollection();
 
-  const chunks: Chunk[] = [];
-  for (const file of files) {
-    const text = await fs.readFile(path.join(DOCUMENTS_DIR, file), "utf-8");
-    chunks.push(...chunkDocument(text, file));
-  }
+  const chunks = await loadChunks();
+  const embeddings = await createEmbeddings(chunks.map((chunk) => chunk.text));
 
-  const points = [];
-  for (const [index, chunk] of chunks.entries()) {
-    const embedding = await createEmbedding(chunk.text);
-    points.push({
-      id: index + 1,
-      vector: embedding,
-      payload: {
-        text: chunk.text,
-        source: chunk.source,
-        section: chunk.section,
-      },
-    });
-  }
+  const points = chunks.map((chunk, index) => ({
+    id: chunk.id,
+    vector: embeddings[index],
+    payload: {
+      text: chunk.text,
+      source: chunk.source,
+      section: chunk.section,
+    },
+  }));
+
+  // Chunk ids are positional, so a shrinking corpus would otherwise leave
+  // orphaned points behind and quietly pollute the evaluation.
+  await qdrant.delete(COLLECTION_NAME, { wait: true, filter: {} });
 
   await qdrant.upsert(COLLECTION_NAME, {
     wait: true,
     points,
   });
 
-  return `Ingested ${points.length} chunks from ${files.length} documents`;
+  const sources = new Set(chunks.map((chunk) => chunk.source));
+
+  return `Ingested ${points.length} chunks from ${sources.size} documents`;
 }

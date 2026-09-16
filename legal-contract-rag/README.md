@@ -1,4 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+A RAG app over a set of sample legal contracts, built for the AI Engineering League.
+
+- **Week 3** — ingest contracts into Qdrant, retrieve with vector search, answer with an LLM.
+- **Week 4** — tell retrieval failures apart from generation failures, and buy back hit-rate@3 with one change.
+
+## Week 4 — debugging retrieval
+
+**The one change:** vector-only search became hybrid search — BM25 keyword scoring over the same chunks, fused with the vector results by Reciprocal Rank Fusion. Nothing else moved: same chunker, same embedding model, same prompt, same chat model, same top-3.
+
+**Why that change.** Legal questions lean on exact identifiers — `SOW-2024-017`, `MSA-2025-031`, `Annex II`, `Exhibit B`, `P1`. An embedding flattens those into "a statement of work", "an annex", so two near-identical clauses in sibling contracts look equally relevant and the wrong one gets fetched. Keyword scoring keeps the identifier literal.
+
+**How to run it**
+
+1. `npm run dev`
+2. `POST /api/qdrant/create-collection`, then `POST /api/ingest` (or the button on `/`).
+3. Open [`/inspect`](http://localhost:3000/inspect) — the inspection view.
+   - *Inspect one question* runs any question through both modes side by side: what was fetched, and the answer each mode produced.
+   - *Run both modes* scores the 20-question evaluation set under vector-only and hybrid, and prints hit-rate@3, MRR@3, and a per-question before/after table.
+
+Results and the failure analysis live in [EVALUATION.md](./EVALUATION.md).
+
+**Where things live**
+
+| File | Role |
+| --- | --- |
+| `lib/chunking.ts` | Splits documents into chunks with stable ids — shared by the vector index and the keyword index so results can be fused by id |
+| `lib/bm25.ts` | BM25 keyword index, built in memory from the same chunks |
+| `lib/search.ts` | `vector` and `hybrid` retrieval; hybrid fuses the two candidate lists with RRF |
+| `lib/eval-set.ts` | 20 questions, each with its correct clause and the fact the answer must state |
+| `lib/evaluate.ts` | Scores a run and labels each question `pass`, `retrieval`, or `generation` |
+| `app/inspect/page.tsx` | The inspection view |
 
 ## Getting Started
 

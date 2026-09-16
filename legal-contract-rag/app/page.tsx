@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 interface Source {
   text: string;
@@ -9,7 +10,10 @@ interface Source {
   score: number;
 }
 
+type Mode = "vector" | "hybrid";
+
 export default function Home() {
+  const [mode, setMode] = useState<Mode>("hybrid");
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [sources, setSources] = useState<Source[]>([]);
@@ -42,7 +46,7 @@ export default function Home() {
       const res = await fetch("/api/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, mode }),
       });
       const data = await res.json();
       if (data.success) {
@@ -69,9 +73,15 @@ export default function Home() {
             Ask questions about the sample contracts. Ingest the documents
             first, then ask away.
           </p>
+          <Link
+            href="/inspect"
+            className="text-sm text-zinc-500 underline-offset-4 hover:underline"
+          >
+            Open the retrieval inspector →
+          </Link>
         </header>
 
-        <section className="flex items-center gap-4">
+        <section className="flex flex-wrap items-center gap-4">
           <button
             onClick={handleIngest}
             disabled={ingesting}
@@ -79,6 +89,20 @@ export default function Home() {
           >
             {ingesting ? "Ingesting..." : "Ingest documents"}
           </button>
+
+          <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+            <label htmlFor="mode">Retrieval</label>
+            <select
+              id="mode"
+              value={mode}
+              onChange={(e) => setMode(e.target.value as Mode)}
+              className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-black dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+            >
+              <option value="vector">Vector only</option>
+              <option value="hybrid">Hybrid (BM25 + RRF)</option>
+            </select>
+          </div>
+
           {status && (
             <span className="text-sm text-zinc-600 dark:text-zinc-400">
               {status}

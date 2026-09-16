@@ -1,18 +1,21 @@
-import { InferenceClient } from "@huggingface/inference";
-import { searchDocuments, type SearchResult } from "./search";
-
-const client = new InferenceClient(process.env.HF_TOKEN);
-
-const CHAT_MODEL = "meta-llama/Llama-3.1-8B-Instruct";
+import { searchDocuments, type SearchMode, type SearchResult } from "./search";
+import { resolveGenerator } from "./generator";
 
 export interface RagAnswer {
   answer: string;
   sources: SearchResult[];
+  mode: SearchMode;
+  generator: string;
 }
 
-export async function askQuestion(question: string): Promise<RagAnswer> {
-  const sources = await searchDocuments(question, 3);
-
+/**
+ * Split out from askQuestion so the evaluator can reuse one retrieval pass for
+ * both the retrieval metrics and the answer it grades.
+ */
+export async function generateAnswer(
+  question: string,
+  sources: SearchResult[],
+): Promise<string> {
   const context = sources
     .map(
       (source, index) =>
@@ -20,27 +23,28 @@ export async function askQuestion(question: string): Promise<RagAnswer> {
     )
     .join("\n\n");
 
-  const response = await client.chatCompletion({
-    model: CHAT_MODEL,
-    messages: [
-      {
-        role: "system",
-        content:
-          "You are a legal contract assistant. Answer the user's question using ONLY the provided contract excerpts. " +
-          "Cite the excerpt numbers you used, e.g. [1]. " +
-          "If the excerpts do not contain the answer, say you don't know. " +
-          "Watch for amendments that override the original agreement.",
-      },
-      {
-        role: "user",
-        content: `Contract excerpts:\n\n${context}\n\nQuestion: ${question}`,
-      },
-    ],
-    max_tokens: 500,
-  });
+  return resolveGenerator().complete([
+    {
+      role: "system",
+      content:
+        "You are a legal contract assistant. Answer the user's question using ONLY the provided contract excerpts. " +
+        "Cite the excerpt numbers you used, e.g. [1]. " +
+        "If the excerpts do not contain the answer, say you don't know. " +
+        "Watch for amendments that override the original agreement.",
+    },
+    {
+      role: "user",
+      content: `Contract excerpts:\n\n${context}\n\nQuestion: ${question}`,
+    },
+  ]);
+}
 
-  return {
-    answer: response.choices[0].message.content ?? "",
-    sources,
-  };
+export async function askQuestion(
+  question: string,
+  mode: SearchMode = "vector",
+): Promise<RagAnswer> {
+  const sources = await searchDocuments(question, 3, mode);
+  const answer = await generateAnswer(question, sources);
+
+  return { answer, sources, mode, generator: resolveGenerator().label };
 }

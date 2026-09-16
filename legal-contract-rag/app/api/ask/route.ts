@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { askQuestion } from "@/lib/rag";
+import type { SearchMode } from "@/lib/search";
+
+export const maxDuration = 120;
 
 export async function POST(request: Request) {
   try {
-    const { question } = await request.json();
+    const { question, mode } = await request.json();
 
     if (!question || typeof question !== "string") {
       return NextResponse.json(
@@ -12,7 +15,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await askQuestion(question);
+    const searchMode: SearchMode = mode === "hybrid" ? "hybrid" : "vector";
+    const result = await askQuestion(question, searchMode);
 
     return NextResponse.json({
       success: true,
