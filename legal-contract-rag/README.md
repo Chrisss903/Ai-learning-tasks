@@ -1,13 +1,16 @@
-A RAG app over a set of sample legal contracts, built for the AI Engineering League.
+A RAG app over a set of sample legal contracts — cricket contracts, which are
+ordinary legal agreements in a setting that is easy to reason about. Built for
+the AI Engineering League.
 
 - **Week 3** — ingest contracts into Qdrant, retrieve with vector search, answer with an LLM.
-- **Week 4** — tell retrieval failures apart from generation failures, and buy back hit-rate@3 with one change.
+- **Week 4** — tell retrieval failures apart from generation failures, and buy back hit-rate@3 with one change. → [EVALUATION.md](./EVALUATION.md)
+- **Week 5** — read a fair sample of real traces, group the failures, rank them, pick what to fix next. → [ERROR-ANALYSIS.md](./ERROR-ANALYSIS.md)
 
 ## Week 4 — debugging retrieval
 
 **The one change:** vector-only search became hybrid search — BM25 keyword scoring over the same chunks, fused with the vector results by Reciprocal Rank Fusion. Nothing else moved: same chunker, same embedding model, same prompt, same chat model, same top-3.
 
-**Why that change.** Legal questions lean on exact identifiers — `SOW-2024-017`, `MSA-2025-031`, `Annex II`, `Exhibit B`, `P1`. An embedding flattens those into "a statement of work", "an annex", so two near-identical clauses in sibling contracts look equally relevant and the wrong one gets fetched. Keyword scoring keeps the identifier literal.
+**Why that change.** Contract questions lean on exact identifiers — `PC-2026-027`, `TRF-2026-008`, `Annex III`, `Exhibit B`, `Level 3`. An embedding flattens those into "a player contract", "an annex", so two near-identical clauses in sibling contracts look equally relevant and the wrong one gets fetched. Keyword scoring keeps the identifier literal.
 
 **How to run it**
 
