@@ -1,0 +1,897 @@
+{
+  "label": "before",
+  "mode": "vector",
+  "ranAt": "2026-09-16T09:40:06.198Z",
+  "embeddingModel": "gemini:gemini-embedding-001",
+  "generator": null,
+  "judgeUsed": false,
+  "judgeValidation": null,
+  "byType": {
+    "wrong-contract": {
+      "passed": 1,
+      "total": 3
+    },
+    "orphaned-clause": {
+      "passed": 1,
+      "total": 3
+    },
+    "superseded-value": {
+      "passed": 3,
+      "total": 3
+    },
+    "unanswerable": {
+      "passed": 3,
+      "total": 3
+    },
+    "straightforward": {
+      "passed": 4,
+      "total": 4
+    }
+  },
+  "overall": {
+    "passed": 12,
+    "total": 16
+  },
+  "results": [
+    {
+      "id": "T01",
+      "type": "wrong-contract",
+      "question": "What is the termination notice period in PC-2026-027?",
+      "gold": [
+        {
+          "source": "player-contract-mendis.txt",
+          "section": "8"
+        }
+      ],
+      "answerMustInclude": [
+        "30 days"
+      ],
+      "answerMustNotInclude": [
+        "90 days"
+      ],
+      "regression": true,
+      "note": "Week 4 failure: retrieved the amendment to PC-2026-011 and answered about the wrong player's contract.",
+      "retrieved": [
+        {
+          "id": 4,
+          "text": "3. AMENDED TERMINATION NOTICE\n\nSection 8 of PC-2026-011 is amended. The notice period of\n60 days is replaced with a notice period of 90 days.",
+          "source": "amendment-pc-2026-011-01.txt",
+          "section": "3. AMENDED TERMINATION NOTICE",
+          "score": 0.7944518,
+          "vectorRank": 1,
+          "keywordRank": null
+        },
+        {
+          "id": 109,
+          "text": "8. TERM AND TERMINATION\n\nThis agreement covers the 2026 and 2027 seasons and may be\nterminated by either party on 90 days written notice before the\nstart of a season.",
+          "source": "sponsorship-agreement.txt",
+          "section": "8. TERM AND TERMINATION",
+          "score": 0.70561224,
+          "vectorRank": 2,
+          "keywordRank": null
+        },
+        {
+          "id": 7,
+          "text": "6. ORDER OF PRECEDENCE\n\nIf this amendment conflicts with PC-2026-011, this amendment\ncontrols for the sections it amends.",
+          "source": "amendment-pc-2026-011-01.txt",
+          "section": "6. ORDER OF PRECEDENCE",
+          "score": 0.66966665,
+          "vectorRank": 3,
+          "keywordRank": null
+        }
+      ],
+      "answer": null,
+      "assertions": [
+        {
+          "name": "retrieved-gold",
+          "passed": false,
+          "detail": "rank absent"
+        }
+      ],
+      "judgement": null,
+      "passed": false
+    },
+    {
+      "id": "T02",
+      "type": "wrong-contract",
+      "question": "What is the match fee in PC-2026-027?",
+      "gold": [
+        {
+          "source": "player-contract-mendis.txt",
+          "section": "5"
+        }
+      ],
+      "answerMustInclude": [
+        "110000|1.1 lakh"
+      ],
+      "answerMustNotInclude": [
+        "150000"
+      ],
+      "regression": true,
+      "note": "Week 4 failure: the correct clause never entered the top 3; sibling contract clauses outranked it.",
+      "retrieved": [
+        {
+          "id": 6,
+          "text": "5. NO OTHER CHANGES\n\nAll other provisions of PC-2026-011, including the Match Fee of\n150,000 Indian rupees in Section 5, remain unchanged.",
+          "source": "amendment-pc-2026-011-01.txt",
+          "section": "5. NO OTHER CHANGES",
+          "score": 0.7445711,
+          "vectorRank": 1,
+          "keywordRank": null
+        },
+        {
+          "id": 59,
+          "text": "PLAYER REGISTRATION AND SERVICES CONTRACT\nFor RAG Training Purposes Only\n\nContract ID: PC-2026-027",
+          "source": "player-contract-mendis.txt",
+          "section": "PLAYER REGISTRATION AND SERVICES CONTRACT",
+          "score": 0.6661676,
+          "vectorRank": 2,
+          "keywordRank": null
+        },
+        {
+          "id": 2,
+          "text": "1. PURPOSE\n\nThis Amendment Number One modifies the Player Registration and\nServices Contract PC-2026-011.",
+          "source": "amendment-pc-2026-011-01.txt",
+          "section": "1. PURPOSE",
+          "score": 0.6547191,
+          "vectorRank": 3,
+          "keywordRank": null
+        }
+      ],
+      "answer": null,
+      "assertions": [
+        {
+          "name": "retrieved-gold",
+          "passed": false,
+          "detail": "rank absent"
+        }
+      ],
+      "judgement": null,
+      "passed": false
+    },
+    {
+      "id": "T03",
+      "type": "wrong-contract",
+      "question": "How many days before the first match must the player report under PC-2026-011?",
+      "gold": [
+        {
+          "source": "player-contract-sharma.txt",
+          "section": "6"
+        }
+      ],
+      "answerMustInclude": [
+        "14 days"
+      ],
+      "answerMustNotInclude": [
+        "7 days"
+      ],
+      "note": "The sibling contract says 7 days, so a near miss produces a plausible wrong number.",
+      "retrieved": [
+        {
+          "id": 2,
+          "text": "1. PURPOSE\n\nThis Amendment Number One modifies the Player Registration and\nServices Contract PC-2026-011.",
+          "source": "amendment-pc-2026-011-01.txt",
+          "section": "1. PURPOSE",
+          "score": 0.74575096,
+          "vectorRank": 1,
+          "keywordRank": null
+        },
+        {
+          "id": 77,
+          "text": "6. PLAYER AVAILABILITY\n\nThe Player must make himself available for all Franchise\nActivity, and must report to the team camp no later than\n14 days before the first league match of the Season.",
+          "source": "player-contract-sharma.txt",
+          "section": "6. PLAYER AVAILABILITY",
+          "score": 0.7314346,
+          "vectorRank": 2,
+          "keywordRank": null
+        },
+        {
+          "id": 71,
+          "text": "PLAYER REGISTRATION AND SERVICES CONTRACT\nFor RAG Training Purposes Only\n\nContract ID: PC-2026-011",
+          "source": "player-contract-sharma.txt",
+          "section": "PLAYER REGISTRATION AND SERVICES CONTRACT",
+          "score": 0.730365,
+          "vectorRank": 3,
+          "keywordRank": null
+        }
+      ],
+      "answer": null,
+      "assertions": [
+        {
+          "name": "retrieved-gold",
+          "passed": true,
+          "detail": "rank 2"
+        }
+      ],
+      "judgement": null,
+      "passed": true
+    },
+    {
+      "id": "T04",
+      "type": "orphaned-clause",
+      "question": "Where are disputes under Dinesh Mendis's player contract resolved?",
+      "gold": [
+        {
+          "source": "player-contract-mendis.txt",
+          "section": "11"
+        }
+      ],
+      "answerMustInclude": [
+        "singapore"
+      ],
+      "regression": true,
+      "note": "Week 4 failure under vector-only: the governing law clause never contains the player's name.",
+      "retrieved": [
+        {
+          "id": 60,
+          "text": "1. PARTIES\n\nThis contract is entered into between Chennai Chargers Cricket\nClub (the \"Franchise\") and Dinesh Mendis (the \"Player\"), an\noverseas fast bowler registered with the Premier Cricket League.",
+          "source": "player-contract-mendis.txt",
+          "section": "1. PARTIES",
+          "score": 0.76500344,
+          "vectorRank": 1,
+          "keywordRank": null
+        },
+        {
+          "id": 72,
+          "text": "1. PARTIES\n\nThis contract is entered into between Chennai Chargers Cricket\nClub (the \"Franchise\") and Rohan Sharma (the \"Player\"), a\ndomestic batting all-rounder registered with the Premier\nCricket League.",
+          "source": "player-contract-sharma.txt",
+          "section": "1. PARTIES",
+          "score": 0.62806296,
+          "vectorRank": 2,
+          "keywordRank": null
+        },
+        {
+          "id": 69,
+          "text": "10. CODE OF CONDUCT\n\nThe Player is bound by the Premier Cricket League Code of\nConduct COC-2026 and the Anti-Doping Policy ADP-2026.",
+          "source": "player-contract-mendis.txt",
+          "section": "10. CODE OF CONDUCT",
+          "score": 0.6147191,
+          "vectorRank": 3,
+          "keywordRank": null
+        }
+      ],
+      "answer": null,
+      "assertions": [
+        {
+          "name": "retrieved-gold",
+          "passed": false,
+          "detail": "rank absent"
+        }
+      ],
+      "judgement": null,
+      "passed": false
+    },
+    {
+      "id": "T05",
+      "type": "orphaned-clause",
+      "question": "What is the transfer fee under TRF-2026-008?",
+      "gold": [
+        {
+          "source": "player-transfer.txt",
+          "section": "2"
+        }
+      ],
+      "answerMustInclude": [
+        "35000000|3.5 crore|35 million"
+      ],
+      "regression": true,
+      "note": "Week 4 failure under vector-only: only the header chunk carries the agreement id.",
+      "retrieved": [
+        {
+          "id": 83,
+          "text": "MID SEASON PLAYER TRANSFER AGREEMENT\nFor RAG Training Purposes Only\n\nAgreement ID: TRF-2026-008",
+          "source": "player-transfer.txt",
+          "section": "MID SEASON PLAYER TRANSFER AGREEMENT",
+          "score": 0.66509515,
+          "vectorRank": 1,
+          "keywordRank": null
+        },
+        {
+          "id": 93,
+          "text": "2. EFFECTIVE DATE\n\nThis agreement becomes effective on August 1, 2026.",
+          "source": "service-agreement.txt",
+          "section": "2. EFFECTIVE DATE",
+          "score": 0.6231489,
+          "vectorRank": 2,
+          "keywordRank": null
+        },
+        {
+          "id": 6,
+          "text": "5. NO OTHER CHANGES\n\nAll other provisions of PC-2026-011, including the Match Fee of\n150,000 Indian rupees in Section 5, remain unchanged.",
+          "source": "amendment-pc-2026-011-01.txt",
+          "section": "5. NO OTHER CHANGES",
+          "score": 0.61651415,
+          "vectorRank": 3,
+          "keywordRank": null
+        }
+      ],
+      "answer": null,
+      "assertions": [
+        {
+          "name": "retrieved-gold",
+          "passed": false,
+          "detail": "rank absent"
+        }
+      ],
+      "judgement": null,
+      "passed": false
+    },
+    {
+      "id": "T06",
+      "type": "orphaned-clause",
+      "question": "How is Rohan Sharma's retainer paid out across the year?",
+      "gold": [
+        {
+          "source": "player-contract-sharma.txt",
+          "section": "4"
+        }
+      ],
+      "answerMustInclude": [
+        "three|3"
+      ],
+      "note": "The instalment schedule clause names neither the player nor the contract id.",
+      "retrieved": [
+        {
+          "id": 75,
+          "text": "4. RETAINER FEE\n\nThe Franchise will pay the Player an annual retainer of\n9,000,000 Indian rupees, payable in three equal instalments on\n1 March, 1 May, and 1 July of each contract year.",
+          "source": "player-contract-sharma.txt",
+          "section": "4. RETAINER FEE",
+          "score": 0.7613193,
+          "vectorRank": 1,
+          "keywordRank": null
+        },
+        {
+          "id": 63,
+          "text": "4. RETAINER FEE\n\nThe Franchise will pay the Player an annual retainer of\n6,500,000 Indian rupees, payable in two equal instalments on\n1 March and 1 June.",
+          "source": "player-contract-mendis.txt",
+          "section": "4. RETAINER FEE",
+          "score": 0.7569787,
+          "vectorRank": 2,
+          "keywordRank": null
+        },
+        {
+          "id": 3,
+          "text": "2. AMENDED RETAINER FEE\n\nSection 4 of PC-2026-011 is amended. The annual retainer of\n9,000,000 Indian rupees is replaced with an annual retainer of\n13,500,000 Indian rupees, reflecting the Player's appointment as\nvice captain.",
+          "source": "amendment-pc-2026-011-01.txt",
+          "section": "2. AMENDED RETAINER FEE",
+          "score": 0.7036704,
+          "vectorRank": 3,
+          "keywordRank": null
+        }
+      ],
+      "answer": null,
+      "assertions": [
+        {
+          "name": "retrieved-gold",
+          "passed": true,
+          "detail": "rank 1"
+        }
+      ],
+      "judgement": null,
+      "passed": true
+    },
+    {
+      "id": "T07",
+      "type": "superseded-value",
+      "question": "What is Rohan Sharma's current annual retainer?",
+      "gold": [
+        {
+          "source": "amendment-pc-2026-011-01.txt",
+          "section": "2"
+        }
+      ],
+      "answerMustInclude": [
+        "13500000|1.35 crore|13.5 million"
+      ],
+      "note": "The original 9,000,000 clause is usually retrieved alongside the amendment.",
+      "retrieved": [
+        {
+          "id": 3,
+          "text": "2. AMENDED RETAINER FEE\n\nSection 4 of PC-2026-011 is amended. The annual retainer of\n9,000,000 Indian rupees is replaced with an annual retainer of\n13,500,000 Indian rupees, reflecting the Player's appointment as\nvice captain.",
+          "source": "amendment-pc-2026-011-01.txt",
+          "section": "2. AMENDED RETAINER FEE",
+          "score": 0.68482757,
+          "vectorRank": 1,
+          "keywordRank": null
+        },
+        {
+          "id": 72,
+          "text": "1. PARTIES\n\nThis contract is entered into between Chennai Chargers Cricket\nClub (the \"Franchise\") and Rohan Sharma (the \"Player\"), a\ndomestic batting all-rounder registered with the Premier\nCricket League.",
+          "source": "player-contract-sharma.txt",
+          "section": "1. PARTIES",
+          "score": 0.67255425,
+          "vectorRank": 2,
+          "keywordRank": null
+        },
+        {
+          "id": 75,
+          "text": "4. RETAINER FEE\n\nThe Franchise will pay the Player an annual retainer of\n9,000,000 Indian rupees, payable in three equal instalments on\n1 March, 1 May, and 1 July of each contract year.",
+          "source": "player-contract-sharma.txt",
+          "section": "4. RETAINER FEE",
+          "score": 0.66923594,
+          "vectorRank": 3,
+          "keywordRank": null
+        }
+      ],
+      "answer": null,
+      "assertions": [
+        {
+          "name": "retrieved-gold",
+          "passed": true,
+          "detail": "rank 1"
+        }
+      ],
+      "judgement": null,
+      "passed": true
+    },
+    {
+      "id": "T08",
+      "type": "superseded-value",
+      "question": "What is the current termination notice period for PC-2026-011?",
+      "gold": [
+        {
+          "source": "amendment-pc-2026-011-01.txt",
+          "section": "3"
+        }
+      ],
+      "answerMustInclude": [
+        "90 days"
+      ],
+      "note": "The original contract says 60 days; the amendment replaced it with 90.",
+      "retrieved": [
+        {
+          "id": 4,
+          "text": "3. AMENDED TERMINATION NOTICE\n\nSection 8 of PC-2026-011 is amended. The notice period of\n60 days is replaced with a notice period of 90 days.",
+          "source": "amendment-pc-2026-011-01.txt",
+          "section": "3. AMENDED TERMINATION NOTICE",
+          "score": 0.8375672,
+          "vectorRank": 1,
+          "keywordRank": null
+        },
+        {
+          "id": 7,
+          "text": "6. ORDER OF PRECEDENCE\n\nIf this amendment conflicts with PC-2026-011, this amendment\ncontrols for the sections it amends.",
+          "source": "amendment-pc-2026-011-01.txt",
+          "section": "6. ORDER OF PRECEDENCE",
+          "score": 0.7054245,
+          "vectorRank": 2,
+          "keywordRank": null
+        },
+        {
+          "id": 6,
+          "text": "5. NO OTHER CHANGES\n\nAll other provisions of PC-2026-011, including the Match Fee of\n150,000 Indian rupees in Section 5, remain unchanged.",
+          "source": "amendment-pc-2026-011-01.txt",
+          "section": "5. NO OTHER CHANGES",
+          "score": 0.6881013,
+          "vectorRank": 3,
+          "keywordRank": null
+        }
+      ],
+      "answer": null,
+      "assertions": [
+        {
+          "name": "retrieved-gold",
+          "passed": true,
+          "detail": "rank 1"
+        }
+      ],
+      "judgement": null,
+      "passed": true
+    },
+    {
+      "id": "T09",
+      "type": "superseded-value",
+      "question": "How much written notice is needed to terminate the AlphaTech service agreement?",
+      "gold": [
+        {
+          "source": "contract-amendment.txt",
+          "section": "2"
+        }
+      ],
+      "answerMustInclude": [
+        "60 days"
+      ],
+      "regression": true,
+      "note": "Observed generation failure: the amendment clause was retrieved at rank 1 and the model still refused it, because that clause never names AlphaTech.",
+      "retrieved": [
+        {
+          "id": 37,
+          "text": "2. TERMINATION NOTICE\n\nSection 5 of the original Service Agreement is hereby\namended.\n\nThe original termination notice period of 30 days is\nreplaced with a termination notice period of 60 days.\n\nThe updated requirement is therefore:\n\nEither party must provide 60 days written notice\nbefore terminating the agreement.",
+          "source": "contract-amendment.txt",
+          "section": "2. TERMINATION NOTICE",
+          "score": 0.7183132,
+          "vectorRank": 1,
+          "keywordRank": null
+        },
+        {
+          "id": 92,
+          "text": "1. PARTIES\n\nThis Service Agreement is entered into between AlphaTech Solutions\nand BetaWorks Pvt. Ltd.",
+          "source": "service-agreement.txt",
+          "section": "1. PARTIES",
+          "score": 0.702055,
+          "vectorRank": 2,
+          "keywordRank": null
+        },
+        {
+          "id": 96,
+          "text": "5. TERMINATION\n\nEither party may terminate this agreement by providing\n30 days written notice to the other party.",
+          "source": "service-agreement.txt",
+          "section": "5. TERMINATION",
+          "score": 0.6995499,
+          "vectorRank": 3,
+          "keywordRank": null
+        }
+      ],
+      "answer": null,
+      "assertions": [
+        {
+          "name": "retrieved-gold",
+          "passed": true,
+          "detail": "rank 1"
+        }
+      ],
+      "judgement": null,
+      "passed": true
+    },
+    {
+      "id": "T10",
+      "type": "unanswerable",
+      "question": "What is the notice period to end the stadium agreement?",
+      "gold": [],
+      "answerMustInclude": [],
+      "expectRefusal": true,
+      "note": "VEN-2026-005 has a cancellation clause but no termination clause. The app must not borrow one from another contract.",
+      "retrieved": [
+        {
+          "id": 109,
+          "text": "8. TERM AND TERMINATION\n\nThis agreement covers the 2026 and 2027 seasons and may be\nterminated by either party on 90 days written notice before the\nstart of a season.",
+          "source": "sponsorship-agreement.txt",
+          "section": "8. TERM AND TERMINATION",
+          "score": 0.69905865,
+          "vectorRank": 1,
+          "keywordRank": null
+        },
+        {
+          "id": 110,
+          "text": "STADIUM HIRE AND MATCH DAY AGREEMENT\nFor RAG Training Purposes Only\n\nAgreement ID: VEN-2026-005",
+          "source": "stadium-agreement.txt",
+          "section": "STADIUM HIRE AND MATCH DAY AGREEMENT",
+          "score": 0.6897061,
+          "vectorRank": 2,
+          "keywordRank": null
+        },
+        {
+          "id": 4,
+          "text": "3. AMENDED TERMINATION NOTICE\n\nSection 8 of PC-2026-011 is amended. The notice period of\n60 days is replaced with a notice period of 90 days.",
+          "source": "amendment-pc-2026-011-01.txt",
+          "section": "3. AMENDED TERMINATION NOTICE",
+          "score": 0.6834784,
+          "vectorRank": 3,
+          "keywordRank": null
+        }
+      ],
+      "answer": null,
+      "assertions": [
+        {
+          "name": "retrieved-gold",
+          "passed": true,
+          "detail": "no gold expected"
+        }
+      ],
+      "judgement": null,
+      "passed": true
+    },
+    {
+      "id": "T11",
+      "type": "unanswerable",
+      "question": "Can Meridian Sports Network show matches in Australia?",
+      "gold": [],
+      "answerMustInclude": [],
+      "expectRefusal": true,
+      "note": "BRD-2026-002 defers other territories to Annex I, which is not in the corpus.",
+      "retrieved": [
+        {
+          "id": 18,
+          "text": "1. GRANT OF RIGHTS\n\nThe Premier Cricket League grants Meridian Sports Network the\nright to broadcast all League matches for the seasons covered by\nthis agreement.",
+          "source": "broadcast-rights.txt",
+          "section": "1. GRANT OF RIGHTS",
+          "score": 0.6741193,
+          "vectorRank": 1,
+          "keywordRank": null
+        },
+        {
+          "id": 24,
+          "text": "7. ADVERTISING INVENTORY\n\nMeridian Sports Network retains all in broadcast advertising\ninventory except for 90 seconds per match reserved for League\npromotional messages.",
+          "source": "broadcast-rights.txt",
+          "section": "7. ADVERTISING INVENTORY",
+          "score": 0.65682137,
+          "vectorRank": 2,
+          "keywordRank": null
+        },
+        {
+          "id": 21,
+          "text": "4. RIGHTS FEE\n\nMeridian Sports Network pays 4,500,000,000 Indian rupees per\nseason, payable in four equal quarterly instalments.",
+          "source": "broadcast-rights.txt",
+          "section": "4. RIGHTS FEE",
+          "score": 0.63013387,
+          "vectorRank": 3,
+          "keywordRank": null
+        }
+      ],
+      "answer": null,
+      "assertions": [
+        {
+          "name": "retrieved-gold",
+          "passed": true,
+          "detail": "no gold expected"
+        }
+      ],
+      "judgement": null,
+      "passed": true
+    },
+    {
+      "id": "T12",
+      "type": "unanswerable",
+      "question": "What is the buyout clause in Rohan Sharma's contract?",
+      "gold": [],
+      "answerMustInclude": [],
+      "expectRefusal": true,
+      "note": "No buyout clause exists anywhere in the corpus. Termination clauses are the tempting near miss.",
+      "retrieved": [
+        {
+          "id": 72,
+          "text": "1. PARTIES\n\nThis contract is entered into between Chennai Chargers Cricket\nClub (the \"Franchise\") and Rohan Sharma (the \"Player\"), a\ndomestic batting all-rounder registered with the Premier\nCricket League.",
+          "source": "player-contract-sharma.txt",
+          "section": "1. PARTIES",
+          "score": 0.7065988,
+          "vectorRank": 1,
+          "keywordRank": null
+        },
+        {
+          "id": 90,
+          "text": "7. SELL ON CLAUSE\n\nIf the Player is transferred again within 24 months, Deccan\nFalcons Cricket Club receives 15 percent of any amount exceeding\n35,000,000 Indian rupees.",
+          "source": "player-transfer.txt",
+          "section": "7. SELL ON CLAUSE",
+          "score": 0.6314751,
+          "vectorRank": 2,
+          "keywordRank": null
+        },
+        {
+          "id": 3,
+          "text": "2. AMENDED RETAINER FEE\n\nSection 4 of PC-2026-011 is amended. The annual retainer of\n9,000,000 Indian rupees is replaced with an annual retainer of\n13,500,000 Indian rupees, reflecting the Player's appointment as\nvice captain.",
+          "source": "amendment-pc-2026-011-01.txt",
+          "section": "2. AMENDED RETAINER FEE",
+          "score": 0.6261615,
+          "vectorRank": 3,
+          "keywordRank": null
+        }
+      ],
+      "answer": null,
+      "assertions": [
+        {
+          "name": "retrieved-gold",
+          "passed": true,
+          "detail": "no gold expected"
+        }
+      ],
+      "judgement": null,
+      "passed": true
+    },
+    {
+      "id": "T13",
+      "type": "straightforward",
+      "question": "How many overseas players may appear in the playing eleven?",
+      "gold": [
+        {
+          "source": "franchise-agreement.txt",
+          "section": "7"
+        }
+      ],
+      "answerMustInclude": [
+        "4|four"
+      ],
+      "note": "Plain lookup. The same clause also caps squad size, so the right number must be picked.",
+      "retrieved": [
+        {
+          "id": 48,
+          "text": "7. SQUAD COMPOSITION\n\nEach squad must contain at least 18 and no more than 25\nregistered players, of whom no more than 8 may be overseas\nplayers, and no more than 4 overseas players may appear in the\nplaying eleven.",
+          "source": "franchise-agreement.txt",
+          "section": "7. SQUAD COMPOSITION",
+          "score": 0.83952385,
+          "vectorRank": 1,
+          "keywordRank": null
+        },
+        {
+          "id": 45,
+          "text": "4. SALARY CAP\n\nThe total of all player retainers and match fees paid by the\nFranchise in a single season may not exceed 900,000,000 Indian\nrupees. Amounts paid under a mid season replacement contract\ncount towards the cap.",
+          "source": "franchise-agreement.txt",
+          "section": "4. SALARY CAP",
+          "score": 0.66989994,
+          "vectorRank": 2,
+          "keywordRank": null
+        },
+        {
+          "id": 64,
+          "text": "5. MATCH FEES\n\nIn addition to the retainer, the Player receives a Match Fee of\n110,000 Indian rupees for each match in which he is named in the\nplaying eleven.",
+          "source": "player-contract-mendis.txt",
+          "section": "5. MATCH FEES",
+          "score": 0.6682029,
+          "vectorRank": 3,
+          "keywordRank": null
+        }
+      ],
+      "answer": null,
+      "assertions": [
+        {
+          "name": "retrieved-gold",
+          "passed": true,
+          "detail": "rank 1"
+        }
+      ],
+      "judgement": null,
+      "passed": true
+    },
+    {
+      "id": "T14",
+      "type": "straightforward",
+      "question": "A player has just reached 8 demerit points. How many matches is he suspended for?",
+      "gold": [
+        {
+          "source": "code-of-conduct.txt",
+          "section": "6"
+        }
+      ],
+      "answerMustInclude": [
+        "two matches|2 matches"
+      ],
+      "note": "Reasoning over a retrieved threshold table.",
+      "retrieved": [
+        {
+          "id": 32,
+          "text": "6. DEMERIT POINT THRESHOLDS\n\nDemerit points remain on a player's record for 24 months. On\nreaching 4 demerit points a player is suspended for one match.\nOn reaching 8 demerit points the suspension is two matches, and\non reaching 12 demerit points the suspension is four matches.",
+          "source": "code-of-conduct.txt",
+          "section": "6. DEMERIT POINT THRESHOLDS",
+          "score": 0.8556503,
+          "vectorRank": 1,
+          "keywordRank": null
+        },
+        {
+          "id": 30,
+          "text": "4. LEVEL 3 OFFENCES\n\nA Level 3 offence is intimidating an umpire or threatening\nlanguage towards a player or official. The sanction is a\nsuspension of one match, plus 4 demerit points.",
+          "source": "code-of-conduct.txt",
+          "section": "4. LEVEL 3 OFFENCES",
+          "score": 0.7762895,
+          "vectorRank": 2,
+          "keywordRank": null
+        },
+        {
+          "id": 31,
+          "text": "5. LEVEL 4 OFFENCES\n\nA Level 4 offence is any act of violence, use of a racial or\ndiscriminatory slur, or match fixing. The sanction is a\nsuspension of between two and twelve matches, plus 6 demerit\npoints, and may lead to immediate termination of the player's\ncontract.",
+          "source": "code-of-conduct.txt",
+          "section": "5. LEVEL 4 OFFENCES",
+          "score": 0.7481534,
+          "vectorRank": 3,
+          "keywordRank": null
+        }
+      ],
+      "answer": null,
+      "assertions": [
+        {
+          "name": "retrieved-gold",
+          "passed": true,
+          "detail": "rank 1"
+        }
+      ],
+      "judgement": null,
+      "passed": true
+    },
+    {
+      "id": "T15",
+      "type": "straightforward",
+      "question": "How quickly must a player report to doping control after being selected?",
+      "gold": [
+        {
+          "source": "anti-doping-policy.txt",
+          "section": "5"
+        }
+      ],
+      "answerMustInclude": [
+        "60 minutes"
+      ],
+      "note": "Distinctive vocabulary appearing in only one clause.",
+      "retrieved": [
+        {
+          "id": 13,
+          "text": "5. TESTING\n\nTesting may be conducted in competition or out of competition,\nwith no advance notice. A player selected for testing must\nreport to the doping control station within 60 minutes.",
+          "source": "anti-doping-policy.txt",
+          "section": "5. TESTING",
+          "score": 0.815511,
+          "vectorRank": 1,
+          "keywordRank": null
+        },
+        {
+          "id": 9,
+          "text": "1. SCOPE\n\nThis policy applies to every player registered with the Premier\nCricket League and is based on the World Anti-Doping Code.",
+          "source": "anti-doping-policy.txt",
+          "section": "1. SCOPE",
+          "score": 0.6919883,
+          "vectorRank": 2,
+          "keywordRank": null
+        },
+        {
+          "id": 14,
+          "text": "6. PROVISIONAL SUSPENSION\n\nFollowing an adverse analytical finding, the player is\nprovisionally suspended within 14 days pending the outcome of\nresults management.",
+          "source": "anti-doping-policy.txt",
+          "section": "6. PROVISIONAL SUSPENSION",
+          "score": 0.6896311,
+          "vectorRank": 3,
+          "keywordRank": null
+        }
+      ],
+      "answer": null,
+      "assertions": [
+        {
+          "name": "retrieved-gold",
+          "passed": true,
+          "detail": "rank 1"
+        }
+      ],
+      "judgement": null,
+      "passed": true
+    },
+    {
+      "id": "T16",
+      "type": "straightforward",
+      "question": "What share of net ticket revenue does the club keep for a home match?",
+      "gold": [
+        {
+          "source": "stadium-agreement.txt",
+          "section": "4"
+        }
+      ],
+      "answerMustInclude": [
+        "80"
+      ],
+      "note": "Plain lookup with a competing 20 percent in the same sentence.",
+      "retrieved": [
+        {
+          "id": 114,
+          "text": "4. TICKETING REVENUE\n\nChennai Chargers Cricket Club retains 80 percent of net ticket\nrevenue for each home match and the Venue retains 20 percent.",
+          "source": "stadium-agreement.txt",
+          "section": "4. TICKETING REVENUE",
+          "score": 0.76786053,
+          "vectorRank": 1,
+          "keywordRank": null
+        },
+        {
+          "id": 46,
+          "text": "5. CENTRAL REVENUE SHARE\n\nThe Franchise receives an equal share of central broadcast and\nsponsorship revenue, distributed within 60 days of the end of\neach season.",
+          "source": "franchise-agreement.txt",
+          "section": "5. CENTRAL REVENUE SHARE",
+          "score": 0.7008362,
+          "vectorRank": 2,
+          "keywordRank": null
+        },
+        {
+          "id": 23,
+          "text": "6. MINIMUM MATCHES\n\nIf fewer than 60 matches are staged in a season, the rights fee\nis reduced proportionally for each match below that number.",
+          "source": "broadcast-rights.txt",
+          "section": "6. MINIMUM MATCHES",
+          "score": 0.64993,
+          "vectorRank": 3,
+          "keywordRank": null
+        }
+      ],
+      "answer": null,
+      "assertions": [
+        {
+          "name": "retrieved-gold",
+          "passed": true,
+          "detail": "rank 1"
+        }
+      ],
+      "judgement": null,
+      "passed": true
+    }
+  ]
+}
