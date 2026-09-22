@@ -152,3 +152,37 @@ export function runAssertions(
 
   return results;
 }
+
+/**
+ * The answer-only checks, for runs that have no fixed top-3 to grade — the
+ * week 7 agent reads as many clauses as it chooses.
+ */
+export function checkAnswer(
+  expected: {
+    answerMustInclude: string[];
+    answerMustNotInclude?: string[];
+    expectRefusal?: boolean;
+  },
+  answer: string,
+): AssertionResult[] {
+  const haystack = normalise(answer);
+  const refused = looksLikeRefusal(answer);
+
+  const results: AssertionResult[] = [
+    expected.expectRefusal
+      ? { name: "refused-as-expected", passed: refused, detail: refused ? "declined" : "answered anyway" }
+      : { name: "did-not-refuse", passed: !refused, detail: refused ? "refused" : "answered" },
+  ];
+
+  for (const requirement of expected.answerMustInclude) {
+    const present = includesAny(haystack, requirement);
+    results.push({ name: `states:${requirement}`, passed: present, detail: present ? "present" : `missing "${requirement}"` });
+  }
+
+  for (const forbidden of expected.answerMustNotInclude ?? []) {
+    const present = includesAny(haystack, forbidden);
+    results.push({ name: `avoids:${forbidden}`, passed: !present, detail: present ? `stated "${forbidden}"` : "absent" });
+  }
+
+  return results;
+}

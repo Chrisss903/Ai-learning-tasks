@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "eval": "tsx scripts/eval.mts"
+    "eval": "tsx scripts/eval.mts",
+    "agent": "tsx scripts/agent.mts",
+    "race": "tsx scripts/race.mts"
   },
   "dependencies": {
     "@huggingface/inference": "^4.13.28",

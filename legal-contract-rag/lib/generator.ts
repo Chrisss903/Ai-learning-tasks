@@ -13,9 +13,38 @@ export interface ChatMessage {
   content: string;
 }
 
+export interface Usage {
+  inputTokens: number;
+  /** Includes thinking tokens — they are billed as output. */
+  outputTokens: number;
+}
+
+/** A completion with what it cost, for the week 7 agent-vs-workflow race. */
+export interface Completion {
+  text: string;
+  usage: Usage;
+  /** Time in the provider call itself, excluding free-tier throttle waits. */
+  ms: number;
+}
+
 export interface Generator {
   label: string;
   complete(messages: ChatMessage[]): Promise<string>;
+  run(messages: ChatMessage[]): Promise<Completion>;
+}
+
+/** Providers implement `run`; `complete` is the text-only view of it. */
+function fromRun(
+  label: string,
+  run: (messages: ChatMessage[]) => Promise<Completion>,
+): Generator {
+  return {
+    label,
+    run,
+    async complete(messages) {
+      return (await run(messages)).text;
+    },
+  };
 }
 
 // Generous, because Gemini counts its thinking tokens against this budget and
@@ -60,27 +89,24 @@ function createThrottle(intervalMs: number) {
 function withRateLimiting(generator: Generator, intervalMs: number): Generator {
   const throttle = createThrottle(intervalMs);
 
-  return {
-    label: generator.label,
-    async complete(messages) {
-      let backoff = 5000;
+  return fromRun(generator.label, async (messages) => {
+    let backoff = 5000;
 
-      for (let attempt = 1; ; attempt++) {
-        await throttle();
+    for (let attempt = 1; ; attempt++) {
+      await throttle();
 
-        try {
-          return await generator.complete(messages);
-        } catch (error) {
-          if (!(error instanceof RateLimitError) || attempt >= MAX_ATTEMPTS) {
-            throw error;
-          }
-
-          await sleep(error.retryAfterMs ?? backoff);
-          backoff *= 2;
+      try {
+        return await generator.run(messages);
+      } catch (error) {
+        if (!(error instanceof RateLimitError) || attempt >= MAX_ATTEMPTS) {
+          throw error;
         }
+
+        await sleep(error.retryAfterMs ?? backoff);
+        backoff *= 2;
       }
-    },
-  };
+    }
+  });
 }
 
 /** Parses Google's "23s" / "1.5s" retryDelay and Retry-After seconds. */
@@ -97,107 +123,120 @@ function openAiCompatible(
   apiKey: string,
   model: string,
 ): Generator {
-  return {
-    label: `${provider}:${model}`,
-    async complete(messages) {
-      const response = await fetch(`${baseUrl}/chat/completions`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ model, messages, max_tokens: MAX_TOKENS }),
-      });
+  return fromRun(`${provider}:${model}`, async (messages) => {
+    const started = Date.now();
+    const response = await fetch(`${baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ model, messages, max_tokens: MAX_TOKENS }),
+    });
 
-      const body = await response.json();
+    const body = await response.json();
 
-      if (response.status === 429) {
-        throw new RateLimitError(
-          `${provider} rate limited`,
-          parseDelay(response.headers.get("retry-after")),
-        );
-      }
+    if (response.status === 429) {
+      throw new RateLimitError(
+        `${provider} rate limited`,
+        parseDelay(response.headers.get("retry-after")),
+      );
+    }
 
-      if (!response.ok) {
-        throw new Error(
-          `${provider} error: ${body?.error?.message ?? response.statusText}`,
-        );
-      }
+    if (!response.ok) {
+      throw new Error(
+        `${provider} error: ${body?.error?.message ?? response.statusText}`,
+      );
+    }
 
-      return body.choices?.[0]?.message?.content ?? "";
-    },
-  };
+    return {
+      text: body.choices?.[0]?.message?.content ?? "",
+      usage: {
+        inputTokens: body.usage?.prompt_tokens ?? 0,
+        outputTokens: body.usage?.completion_tokens ?? 0,
+      },
+      ms: Date.now() - started,
+    };
+  });
 }
 
 function gemini(apiKey: string, model: string): Generator {
-  return {
-    label: `gemini:${model}`,
-    async complete(messages) {
-      const system = messages
-        .filter((message) => message.role === "system")
-        .map((message) => message.content)
-        .join("\n");
+  return fromRun(`gemini:${model}`, async (messages) => {
+    const started = Date.now();
+    const system = messages
+      .filter((message) => message.role === "system")
+      .map((message) => message.content)
+      .join("\n");
 
-      const contents = messages
-        .filter((message) => message.role !== "system")
-        .map((message) => ({
-          role: "user",
-          parts: [{ text: message.content }],
-        }));
+    const contents = messages
+      .filter((message) => message.role !== "system")
+      .map((message) => ({
+        role: "user",
+        parts: [{ text: message.content }],
+      }));
 
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-        {
-          method: "POST",
-          headers: {
-            "x-goog-api-key": apiKey,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...(system
-              ? { system_instruction: { parts: [{ text: system }] } }
-              : {}),
-            contents,
-            generationConfig: { maxOutputTokens: MAX_TOKENS },
-          }),
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+      {
+        method: "POST",
+        headers: {
+          "x-goog-api-key": apiKey,
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          ...(system
+            ? { system_instruction: { parts: [{ text: system }] } }
+            : {}),
+          contents,
+          generationConfig: { maxOutputTokens: MAX_TOKENS },
+        }),
+      },
+    );
+
+    const body = await response.json();
+
+    if (response.status === 429) {
+      const retryInfo = body?.error?.details?.find((detail: { "@type"?: string }) =>
+        detail["@type"]?.includes("RetryInfo"),
       );
 
-      const body = await response.json();
+      throw new RateLimitError(
+        "Gemini rate limited",
+        parseDelay(retryInfo?.retryDelay),
+      );
+    }
 
-      if (response.status === 429) {
-        const retryInfo = body?.error?.details?.find((detail: { "@type"?: string }) =>
-          detail["@type"]?.includes("RetryInfo"),
-        );
+    if (!response.ok) {
+      throw new Error(
+        `Gemini error: ${body?.error?.message ?? response.statusText}`,
+      );
+    }
 
-        throw new RateLimitError(
-          "Gemini rate limited",
-          parseDelay(retryInfo?.retryDelay),
-        );
-      }
+    // Thinking models emit several parts; only some carry the answer text.
+    const parts = body.candidates?.[0]?.content?.parts ?? [];
+    const text = parts
+      .map((part: { text?: string }) => part.text ?? "")
+      .join("")
+      .trim();
 
-      if (!response.ok) {
-        throw new Error(
-          `Gemini error: ${body?.error?.message ?? response.statusText}`,
-        );
-      }
+    if (!text) {
+      throw new Error(
+        `Gemini returned no text (finishReason: ${body.candidates?.[0]?.finishReason ?? "unknown"})`,
+      );
+    }
 
-      // Thinking models emit several parts; only some carry the answer text.
-      const parts = body.candidates?.[0]?.content?.parts ?? [];
-      const text = parts
-        .map((part: { text?: string }) => part.text ?? "")
-        .join("")
-        .trim();
+    const usage = body.usageMetadata ?? {};
 
-      if (!text) {
-        throw new Error(
-          `Gemini returned no text (finishReason: ${body.candidates?.[0]?.finishReason ?? "unknown"})`,
-        );
-      }
-
-      return text;
-    },
-  };
+    return {
+      text,
+      usage: {
+        inputTokens: usage.promptTokenCount ?? 0,
+        outputTokens:
+          (usage.candidatesTokenCount ?? 0) + (usage.thoughtsTokenCount ?? 0),
+      },
+      ms: Date.now() - started,
+    };
+  });
 }
 
 /** The SDK's message type carries an index signature that ours does not. */
@@ -208,18 +247,23 @@ type HuggingFaceMessages = Parameters<
 function huggingFace(model: string): Generator {
   const client = new InferenceClient(process.env.HF_TOKEN);
 
-  return {
-    label: `huggingface:${model}`,
-    async complete(messages) {
-      const response = await client.chatCompletion({
-        model,
-        messages: messages as unknown as HuggingFaceMessages,
-        max_tokens: MAX_TOKENS,
-      });
+  return fromRun(`huggingface:${model}`, async (messages) => {
+    const started = Date.now();
+    const response = await client.chatCompletion({
+      model,
+      messages: messages as unknown as HuggingFaceMessages,
+      max_tokens: MAX_TOKENS,
+    });
 
-      return response.choices[0].message.content ?? "";
-    },
-  };
+    return {
+      text: response.choices[0].message.content ?? "",
+      usage: {
+        inputTokens: response.usage?.prompt_tokens ?? 0,
+        outputTokens: response.usage?.completion_tokens ?? 0,
+      },
+      ms: Date.now() - started,
+    };
+  });
 }
 
 /**

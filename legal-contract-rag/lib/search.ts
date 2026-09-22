@@ -63,13 +63,24 @@ async function vectorSearch(
 async function hybridSearch(
   query: string,
   limit: number,
+  source?: string,
 ): Promise<SearchResult[]> {
+  const chunks = await loadChunks();
+
+  // Scoped to one document, every chunk is a candidate — a document has about
+  // a dozen, so ranking all of them costs nothing and none can be crowded out.
+  const candidateLimit = source ? chunks.length : CANDIDATE_LIMIT;
+  const inScope = (chunkSource: string) => !source || chunkSource === source;
+
   const [semantic, keyword] = await Promise.all([
-    vectorCandidates(query, CANDIDATE_LIMIT),
-    searchKeywords(query, CANDIDATE_LIMIT),
+    vectorCandidates(query, candidateLimit).then((list) =>
+      list.filter((candidate) => inScope(candidate.source)),
+    ),
+    searchKeywords(query, candidateLimit).then((list) =>
+      list.filter((result) => inScope(result.chunk.source)),
+    ),
   ]);
 
-  const chunks = await loadChunks();
   const byId = new Map(chunks.map((chunk) => [chunk.id, chunk]));
 
   const fused = new Map<
@@ -114,11 +125,15 @@ async function hybridSearch(
     });
 }
 
+/** `source` restricts a hybrid search to one document file. */
 export async function searchDocuments(
   query: string,
   limit = 3,
   mode: SearchMode = "vector",
+  source?: string,
 ): Promise<SearchResult[]> {
+  if (source) return hybridSearch(query, limit, source);
+
   return mode === "hybrid"
     ? hybridSearch(query, limit)
     : vectorSearch(query, limit);
