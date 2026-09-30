@@ -3,6 +3,15 @@ import path from "path";
 
 const DOCUMENTS_DIR = path.join(process.cwd(), "documents");
 
+/**
+ * Week 8: documents an attacker got into the store. They are loaded only when
+ * ATTACK_DOCS is set, and always after the real ones, so every existing chunk
+ * keeps the id it has in Qdrant and the keyword and vector lists still fuse.
+ * Being absent from Qdrant, they are reached through BM25 and through
+ * find_amendments — which is exactly how a freshly uploaded file behaves.
+ */
+const ATTACK_DIR = path.join(process.cwd(), "attack-documents");
+
 export interface Chunk {
   id: number;
   text: string;
@@ -23,7 +32,20 @@ function chunkDocument(text: string, source: string): Omit<Chunk, "id">[] {
     }));
 }
 
-let cached: Chunk[] | null = null;
+async function readDirectory(directory: string): Promise<[string, string][]> {
+  const files = (await fs.readdir(directory).catch(() => []))
+    .filter((file) => file.endsWith(".txt"))
+    .sort();
+
+  return Promise.all(
+    files.map(
+      async (file) =>
+        [file, await fs.readFile(path.join(directory, file), "utf-8")] as [string, string],
+    ),
+  );
+}
+
+const cached = new Map<string, Chunk[]>();
 
 /**
  * The single source of truth for chunks. Ingestion and the keyword index both
@@ -31,20 +53,24 @@ let cached: Chunk[] | null = null;
  * what lets the two result lists be fused by id.
  */
 export async function loadChunks(): Promise<Chunk[]> {
-  if (cached) return cached;
+  const withAttack = process.env.ATTACK_DOCS === "1";
+  const key = withAttack ? "attack" : "clean";
 
-  const files = (await fs.readdir(DOCUMENTS_DIR))
-    .filter((file) => file.endsWith(".txt"))
-    .sort();
+  const hit = cached.get(key);
+  if (hit) return hit;
+
+  const files = [
+    ...(await readDirectory(DOCUMENTS_DIR)),
+    ...(withAttack ? await readDirectory(ATTACK_DIR) : []),
+  ];
 
   const chunks: Chunk[] = [];
-  for (const file of files) {
-    const text = await fs.readFile(path.join(DOCUMENTS_DIR, file), "utf-8");
+  for (const [file, text] of files) {
     for (const chunk of chunkDocument(text, file)) {
       chunks.push({ id: chunks.length + 1, ...chunk });
     }
   }
 
-  cached = chunks;
+  cached.set(key, chunks);
   return chunks;
 }

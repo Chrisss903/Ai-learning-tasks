@@ -98,11 +98,16 @@ function withRateLimiting(generator: Generator, intervalMs: number): Generator {
       try {
         return await generator.run(messages);
       } catch (error) {
-        if (!(error instanceof RateLimitError) || attempt >= MAX_ATTEMPTS) {
-          throw error;
-        }
+        // A dropped connection is as temporary as a 429, and losing a whole
+        // evaluation batch to one is worse than waiting a few seconds.
+        const transient =
+          error instanceof RateLimitError ||
+          (error instanceof Error &&
+            /fetch failed|network|timeout|ECONNRESET|returned no text/i.test(error.message));
 
-        await sleep(error.retryAfterMs ?? backoff);
+        if (!transient || attempt >= MAX_ATTEMPTS) throw error;
+
+        await sleep(error instanceof RateLimitError ? (error.retryAfterMs ?? backoff) : backoff);
         backoff *= 2;
       }
     }
@@ -175,25 +180,31 @@ function gemini(apiKey: string, model: string): Generator {
         parts: [{ text: message.content }],
       }));
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-      {
-        method: "POST",
-        headers: {
-          "x-goog-api-key": apiKey,
-          "Content-Type": "application/json",
+    const call = (version: string) =>
+      fetch(
+        `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent`,
+        {
+          method: "POST",
+          headers: {
+            "x-goog-api-key": apiKey,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...(system
+              ? { system_instruction: { parts: [{ text: system }] } }
+              : {}),
+            contents,
+            generationConfig: { maxOutputTokens: MAX_TOKENS },
+          }),
         },
-        body: JSON.stringify({
-          ...(system
-            ? { system_instruction: { parts: [{ text: system }] } }
-            : {}),
-          contents,
-          generationConfig: { maxOutputTokens: MAX_TOKENS },
-        }),
-      },
-    );
+      );
 
-    const body = await response.json();
+    // Models released after v1beta was frozen answer only on v1, and the older
+    // ones answer on both, so a 404 is a version mismatch rather than a typo.
+    let response = await call(process.env.GEMINI_API_VERSION ?? "v1beta");
+    if (response.status === 404) response = await call("v1");
+
+    const body = await response.json().catch(() => ({}));
 
     if (response.status === 429) {
       const retryInfo = body?.error?.details?.find((detail: { "@type"?: string }) =>

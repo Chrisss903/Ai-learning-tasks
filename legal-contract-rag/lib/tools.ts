@@ -28,11 +28,15 @@ export interface Tool {
   execute(input: Record<string, unknown>): Promise<ToolResult>;
 }
 
+/** "PC-2026-011 §4" — how a clause is cited, and how a citation is checked. */
+export async function clauseLabel(chunk: Chunk): Promise<string> {
+  const contract = (await listContracts()).find((c) => c.source === chunk.source);
+  return `${contract?.id ?? chunk.source} §${sectionNumber(chunk.section) ?? "?"}`;
+}
+
 /** Every clause is labelled with its contract id, because clauses rarely name one. */
 export async function formatClause(chunk: Chunk): Promise<string> {
-  const contract = (await listContracts()).find((c) => c.source === chunk.source);
-  const label = `${contract?.id ?? chunk.source} §${sectionNumber(chunk.section) ?? "?"}`;
-  return `[${label}] ${chunk.text}`;
+  return `[${await clauseLabel(chunk)}] ${chunk.text}`;
 }
 
 async function formatClauses(chunks: Chunk[]): Promise<string> {

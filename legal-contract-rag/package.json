@@ -9,7 +9,9 @@
     "lint": "eslint",
     "eval": "tsx scripts/eval.mts",
     "agent": "tsx scripts/agent.mts",
-    "race": "tsx scripts/race.mts"
+    "race": "tsx scripts/race.mts",
+    "trajectory": "tsx scripts/trajectory.mts",
+    "attack": "tsx scripts/attack.mts"
   },
   "dependencies": {
     "@huggingface/inference": "^4.13.28",

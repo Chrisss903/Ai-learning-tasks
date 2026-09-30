@@ -1,5 +1,6 @@
 import type { Chunk } from "./chunking";
 import { findAmendments, listContracts, resolveContracts, sectionsOf } from "./contracts";
+import { asUntrustedData, DATA_RULE, scanDocumentText } from "./defences";
 import { resolveGenerator, type Usage } from "./generator";
 import { searchDocuments } from "./search";
 import { formatClause } from "./tools";
@@ -29,6 +30,8 @@ export interface WorkflowRun {
   activeMs: number;
   wallMs: number;
   clauses: Chunk[];
+  /** Injection patterns found in the clauses it read. */
+  redactions: string[];
 }
 
 const SYSTEM_PROMPT =
@@ -40,10 +43,11 @@ const SYSTEM_PROMPT =
 
 export async function runWorkflow(
   question: string,
-  options: { onStep?: (step: WorkflowStep) => void } = {},
+  options: { onStep?: (step: WorkflowStep) => void; sanitise?: boolean } = {},
 ): Promise<WorkflowRun> {
   const started = Date.now();
   const steps: WorkflowStep[] = [];
+  const redactions: string[] = [];
 
   const timed = async <T>(name: string, work: () => Promise<T>, describe: (value: T) => string) => {
     const stepStarted = Date.now();
@@ -95,13 +99,21 @@ export async function runWorkflow(
 
   const clauses = [...new Map([...retrieved, ...amendmentClauses].map((c) => [c.id, c])).values()];
 
-  // 4. One model call.
-  const context = (await Promise.all(clauses.map(formatClause))).join("\n\n");
+  // 4. One model call. The clauses are documents, so they get the same
+  // week 8 treatment the agent gives them when defences are on.
+  const formatted = (await Promise.all(clauses.map(formatClause))).join("\n\n");
+  const scan = scanDocumentText(formatted);
+  redactions.push(...scan.hits);
+  const context = options.sanitise ? asUntrustedData(scan.clean) : formatted;
+
   const completion = await timed(
     "answer",
     () =>
       resolveGenerator().run([
-        { role: "system", content: SYSTEM_PROMPT },
+        {
+          role: "system",
+          content: options.sanitise ? `${SYSTEM_PROMPT}\n\n${DATA_RULE}` : SYSTEM_PROMPT,
+        },
         { role: "user", content: `Contract clauses:\n\n${context}\n\nQuestion: ${question}` },
       ]),
     (c) => `${c.usage.inputTokens} in / ${c.usage.outputTokens} out tokens`,
@@ -118,5 +130,6 @@ export async function runWorkflow(
     activeMs: lookupMs + completion.ms,
     wallMs: Date.now() - started,
     clauses,
+    redactions: [...new Set(redactions)],
   };
 }
