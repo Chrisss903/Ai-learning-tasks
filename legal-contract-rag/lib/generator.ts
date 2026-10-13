@@ -99,11 +99,14 @@ function withRateLimiting(generator: Generator, intervalMs: number): Generator {
         return await generator.run(messages);
       } catch (error) {
         // A dropped connection is as temporary as a 429, and losing a whole
-        // evaluation batch to one is worse than waiting a few seconds.
+        // evaluation batch to one is worse than waiting a few seconds. So is
+        // Gemini's 503 "experiencing high demand".
         const transient =
           error instanceof RateLimitError ||
           (error instanceof Error &&
-            /fetch failed|network|timeout|ECONNRESET|returned no text/i.test(error.message));
+            /fetch failed|network|timeout|ECONNRESET|returned no text|high demand|overloaded|unavailable/i.test(
+              error.message,
+            ));
 
         if (!transient || attempt >= MAX_ATTEMPTS) throw error;
 
