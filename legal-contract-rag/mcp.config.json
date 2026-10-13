@@ -3,6 +3,14 @@
     "clause-search": {
       "command": "npx",
       "args": ["tsx", "mcp/clause-search/server.mts"]
+    },
+    "contract-repository": {
+      "command": "npx",
+      "args": ["tsx", "vendor/contract-repository-mcp/server.mts"],
+      "env": {
+        "CONTRACT_REPO_DIR": "documents",
+        "CONTRACT_REPO_TOKEN": "${CONTRACT_REPO_TOKEN}"
+      }
     }
   }
 }
