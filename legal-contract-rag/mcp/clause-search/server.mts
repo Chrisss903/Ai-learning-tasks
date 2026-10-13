@@ -21,6 +21,7 @@ console.warn = console.error;
 
 // Imported after the environment is loaded: lib modules read it when they load.
 const { searchDocuments } = await import("../../lib/search");
+const { searchKeywords } = await import("../../lib/bm25");
 const { findAmendments, findContract, listContracts, readSection, sectionsOf } = await import(
   "../../lib/contracts"
 );
@@ -68,36 +69,91 @@ server.registerTool(
   },
 );
 
+/**
+ * Week 9, Set F: this description is written as a prompt — when to call the
+ * tool, how to word the call, what the result does not include, and what to do
+ * when it fails — because it is the only thing a model ever reads about it.
+ */
 server.registerTool(
   "search_clauses",
   {
     title: "Search clauses",
-    description:
-      "Hybrid keyword + semantic search over clauses; returns the top 3, each labelled [CONTRACT-ID §N]. " +
-      "Pass contract_id whenever you know which contract the question is about — the two player contracts share almost identical wording, and an unscoped search often returns the other player's clause. " +
-      "Leave contract_id out only to discover which document covers a topic.",
+    description: [
+      "Finds the clauses that deal with a topic when you do not know which section holds them. Returns the 3 best matches, each labelled [CONTRACT-ID §N]; cite those labels.",
+      "Use it when you know what the clause is about (termination notice, injury, image rights) but not its number. If you already know the section, read_section is exact and cheaper.",
+      "Word the query the way a contract does, not the way the user asked: \"notice period\", \"retainer\", \"Franchise Activity\".",
+      "Pass contract_id whenever you know the contract. The two player contracts (PC-2026-011, PC-2026-027) are worded almost identically, and an unscoped search often returns the other player's clause. Leave it out only to find which document covers a topic.",
+      "Clauses come back as executed: amendments are NOT applied. Before answering with a fee, date or notice period, check that contract's amendments.",
+      "If the search index is down, the reply says so and falls back to keyword matching. That means an outage, not a missing clause, and repeating the call will not fix it. Follow what the reply suggests instead.",
+    ].join("\n"),
     inputSchema: {
-      query: z.string(),
-      contract_id: z.string().optional(),
+      query: z.string().describe('Words the clause itself would use, e.g. "termination notice period".'),
+      contract_id: z
+        .string()
+        .optional()
+        .describe("Id from the contract's header, e.g. PC-2026-027. Omit only to search every document."),
     },
     annotations: { readOnlyHint: true },
   },
   async ({ query, contract_id }) => {
     if (!query.trim()) return failure('search_clauses needs a "query".');
 
-    let source: string | undefined;
+    let contract: Awaited<ReturnType<typeof findContract>>;
     if (contract_id?.trim()) {
-      const contract = await findContract(contract_id);
+      contract = await findContract(contract_id);
       if (!contract) return unknownContract(contract_id);
-      source = contract.source;
     }
 
-    const results = await searchDocuments(query, 3, "hybrid", source);
-    if (!results.length) return reply("No clauses matched.");
-
-    return reply(await formatClauses(results));
+    try {
+      const results = await searchDocuments(query, 3, "hybrid", contract?.source);
+      if (!results.length) return reply("No clauses matched.");
+      return reply(await formatClauses(results));
+    } catch (error) {
+      return searchOutage(query, contract, error);
+    }
   },
 );
+
+/**
+ * The semantic half of the search lives in Qdrant. When it cannot be reached,
+ * the old reply was the raw exception — "fetch failed" — which a model reads as
+ * a bad query and retries, reworded, until it runs out of steps. This reply
+ * names the outage, says what it does and does not mean, still returns the
+ * keyword half of the search, and points at a tool that needs no index.
+ */
+async function searchOutage(
+  query: string,
+  contract: Awaited<ReturnType<typeof findContract>>,
+  error: unknown,
+) {
+  const reason = (error as { cause?: { code?: string } })?.cause?.code ?? (error instanceof Error ? error.message : String(error));
+  const scope = contract ? contract.id : "the store";
+
+  const keyword = (await searchKeywords(query, 1000))
+    .filter((result) => !contract || result.chunk.source === contract.source)
+    .slice(0, 3)
+    .map((result) => result.chunk);
+
+  const sections = contract
+    ? (await sectionsOf(contract.source)).map((chunk) => `§${chunk.section.replace(/^(\d+)\.\s*/, "$1 ")}`).join("; ")
+    : "";
+  const next = contract
+    ? `read_section needs no index — ${contract.id}'s sections are: ${sections}.`
+    : "list_contracts and read_section need no index.";
+
+  const head =
+    `The search index is unreachable (vector store: ${reason}). This is an outage on the search side, not a sign that ${scope} lacks such a clause, ` +
+    "and repeating this call — reworded or not — will not help.";
+
+  if (!keyword.length) {
+    return failure(`${head} Keyword matching found nothing for "${query}" either. Next: ${next}`);
+  }
+
+  return reply(
+    `${head}\nKeyword-only matches (they share your words; a clause worded differently can be missed):\n\n` +
+      `${await formatClauses(keyword)}\n\nIf none of these answers the question: ${next}`,
+  );
+}
 
 server.registerTool(
   "read_section",
