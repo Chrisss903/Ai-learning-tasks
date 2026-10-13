@@ -1,6 +1,5 @@
 import type { AgentRun, AgentStep } from "./agent";
 import { citationsIn } from "./defences";
-import { TOOLS } from "./tools";
 
 /**
  * Week 8: scoring the path, not the answer.
@@ -26,16 +25,15 @@ export interface TrajectoryCheck {
   detail: string;
 }
 
-const TOOL_NAMES = new Set(TOOLS.map((tool) => tool.name));
-
-const isToolCall = (step: AgentStep) => TOOL_NAMES.has(step.action);
+/** Week 9: tools are discovered per run, so "a real tool" means one the run was offered. */
+const isToolCall = (run: AgentRun) => (step: AgentStep) => run.tools.includes(step.action);
 
 /** A tool call the store rejected: a contract or section that does not exist. */
 function isBadInput(step: AgentStep): boolean {
   return (
-    /^No contract has id/.test(step.observation) ||
+    /No contract has id/.test(step.observation) ||
     /has no section \d/.test(step.observation) ||
-    /needs a "query"/.test(step.observation)
+    /needs a "query"|Input validation error/.test(step.observation)
   );
 }
 
@@ -49,7 +47,7 @@ export function scoreTrajectory(
   expectation: TrajectoryExpectation,
 ): TrajectoryCheck[] {
   const checks: TrajectoryCheck[] = [];
-  const toolCalls = run.steps.filter(isToolCall);
+  const toolCalls = run.steps.filter(isToolCall(run));
   const targets = expectation.targets.map((id) => id.toUpperCase());
 
   // 1. Did it finish under its own power, rather than run out or give up quietly?
@@ -69,7 +67,7 @@ export function scoreTrajectory(
 
   // 3. Wrong tool or invented input.
   const unknownTool = run.steps.filter(
-    (step) => step.action !== "finish" && !TOOL_NAMES.has(step.action),
+    (step) => step.action !== "finish" && !run.tools.includes(step.action),
   );
   const badInputs = toolCalls.filter(isBadInput);
   checks.push({
@@ -154,6 +152,6 @@ export function toolChoiceAccuracy(run: AgentRun): number | null {
   const attempts = run.steps.filter((step) => step.action !== "finish");
   if (!attempts.length) return null;
 
-  const good = attempts.filter((step) => isToolCall(step) && !isBadInput(step));
+  const good = attempts.filter((step) => isToolCall(run)(step) && !isBadInput(step));
   return good.length / attempts.length;
 }

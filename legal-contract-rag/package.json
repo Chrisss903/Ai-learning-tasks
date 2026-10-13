@@ -11,14 +11,17 @@
     "agent": "tsx scripts/agent.mts",
     "race": "tsx scripts/race.mts",
     "trajectory": "tsx scripts/trajectory.mts",
-    "attack": "tsx scripts/attack.mts"
+    "attack": "tsx scripts/attack.mts",
+    "mcp:tools": "tsx scripts/mcp-tools.mts"
   },
   "dependencies": {
     "@huggingface/inference": "^4.13.28",
+    "@modelcontextprotocol/sdk": "^1.32.1",
     "@qdrant/js-client-rest": "^1.19.0",
     "next": "16.3.3",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

@@ -14,6 +14,7 @@ import path from "path";
 process.env.ATTACK_DOCS = "1";
 
 const { runAgent } = await import("../lib/agent");
+const { closeTools } = await import("../lib/mcp-client");
 const { runWorkflow } = await import("../lib/workflow");
 const { ALL_DEFENCES, NO_DEFENCES } = await import("../lib/defences");
 const { ATTACK_SET } = await import("../lib/attack-set");
@@ -153,3 +154,6 @@ writeFileSync(
   ),
 );
 console.log(`\n  saved → evals/${path.basename(outfile)}\n`);
+
+// The MCP servers are child processes; the script cannot exit while they run.
+await closeTools();

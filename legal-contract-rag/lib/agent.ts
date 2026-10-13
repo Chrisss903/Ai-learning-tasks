@@ -1,7 +1,7 @@
-import type { Chunk } from "./chunking";
 import { findAmendments, listContracts } from "./contracts";
 import {
   asUntrustedData,
+  citationsIn,
   DATA_RULE,
   invalidCitations,
   NO_DEFENCES,
@@ -9,7 +9,7 @@ import {
   type Defences,
 } from "./defences";
 import { resolveGenerator, type Usage } from "./generator";
-import { clauseLabel, FINISH, TOOLS } from "./tools";
+import { discoverTools, type DiscoveredTool, type InputSchema } from "./mcp-client";
 
 /**
  * The week 7 contract agent, built by hand: a ReAct loop.
@@ -19,6 +19,10 @@ import { clauseLabel, FINISH, TOOLS } from "./tools";
  * Each turn the model sees the question and everything it has done so far, and
  * replies with one JSON action. The loop runs the tool, records what came back,
  * and asks again. Every step is kept, so a run can be replayed and debugged.
+ *
+ * Week 9: the tools are no longer listed here. They are discovered over MCP
+ * from the servers in mcp.config.json, and the prompt is built from whatever
+ * tools/list returned — so a new server is a config change, not a code change.
  */
 export interface AgentLimits {
   /** Model turns, including the one that calls finish. */
@@ -51,6 +55,8 @@ export interface AgentStep {
   action: string;
   input: Record<string, unknown>;
   observation: string;
+  /** The MCP server that ran the tool; null when no tool ran. */
+  server: string | null;
   /** Injection patterns found in what this step read, when sanitising. */
   redactions: string[];
   usage: Usage;
@@ -68,7 +74,8 @@ export interface AgentRun {
   /** Time in model calls and tools — excludes free-tier throttle waits. */
   activeMs: number;
   wallMs: number;
-  clauses: Chunk[];
+  /** Every tool the agent discovered for this run. */
+  tools: string[];
   /** Clause labels the tools returned, for checking the answer's citations. */
   observedLabels: string[];
   defences: Defences;
@@ -93,14 +100,42 @@ const MAX_REPEATS = 2;
 /** A gate sends the answer back to be corrected; it does not argue forever. */
 const MAX_GATE_REJECTIONS = 2;
 
-const SYSTEM_PROMPT = `You are a research agent for the legal team of a cricket franchise. You answer questions about the contracts in a document store, working one step at a time with tools.
+/** Not a real tool — the action that ends the loop. Described alongside the others. */
+const FINISH = {
+  name: "finish",
+  description:
+    "Ends the task with your final answer. Cite every clause you relied on as [CONTRACT-ID §N]. " +
+    "If the documents do not contain the answer, say \"I don't know\" and what is missing — never borrow a clause from a different contract.",
+  inputSchema: { type: "object", properties: { answer: { type: "string" } }, required: ["answer"] } as InputSchema,
+};
+
+type PropertySchema = { type?: string | string[]; description?: string };
+
+/** One tool as the model sees it: its name, input shape and description, from tools/list. */
+function renderTool(tool: { name: string; description: string; inputSchema: InputSchema }): string {
+  const properties = Object.entries((tool.inputSchema.properties ?? {}) as Record<string, PropertySchema>);
+  const required = new Set(tool.inputSchema.required ?? []);
+  const type = (schema: PropertySchema) => [schema.type ?? "any"].flat().join(" | ");
+
+  const shape = `{${properties
+    .map(([key, schema]) => `"${key}"${required.has(key) ? "" : "?"}: ${type(schema)}`)
+    .join(", ")}}`;
+  const notes = properties
+    .filter(([, schema]) => schema.description)
+    .map(([key, schema]) => `\n    ${key}: ${schema.description}`)
+    .join("");
+
+  return `- ${tool.name} ${shape}\n  ${tool.description.replace(/\n/g, "\n  ")}${notes}`;
+}
+
+const systemPrompt = (tools: DiscoveredTool[]) => `You are a research agent for the legal team of a cricket franchise. You answer questions about the contracts in a document store, working one step at a time with tools.
 
 Tools:
-${[...TOOLS, FINISH].map((tool) => `- ${tool.name} ${tool.input}\n  ${tool.description}`).join("\n")}
+${[...tools, FINISH].map(renderTool).join("\n")}
 
 How to work:
 - Find the right contract id before searching; scope searches to it.
-- Before answering with a value from a contract, check find_amendments for that contract.
+- Before answering with a value from a contract, check that contract's amendments.
 - If a question involves two contracts, research each one.
 - Use only what the tools return. Do arithmetic yourself when asked.
 - Older tool results are trimmed from your memory, so write every fact you will need later into your thought.
@@ -206,10 +241,11 @@ export async function runAgent(
   const defences = { ...NO_DEFENCES, ...options.defences };
   const generator = resolveGenerator();
   const started = Date.now();
+  const tools = await discoverTools();
+  const prompt = systemPrompt(tools);
 
   const steps: AgentStep[] = [];
   const usage: Usage = { inputTokens: 0, outputTokens: 0 };
-  const clauses = new Map<number, Chunk>();
   const seen = new Set<string>();
   const labels = new Set<string>();
   const amendmentsChecked = new Set<string>();
@@ -228,7 +264,7 @@ export async function runAgent(
     usage,
     activeMs,
     wallMs: Date.now() - started,
-    clauses: [...clauses.values()],
+    tools: tools.map((tool) => tool.name),
     observedLabels: [...labels],
     defences,
     redactions: [...redactions],
@@ -263,7 +299,7 @@ export async function runAgent(
         if (!(await findAmendments(contract.id)).length) continue;
 
         problems.push(
-          `Your answer relies on ${contract.id}, which has amendments you never checked. Call find_amendments for ${contract.id} before finishing.`,
+          `Your answer relies on ${contract.id}, which has amendments you never checked. Check the amendments of ${contract.id} before finishing.`,
         );
       }
     }
@@ -280,7 +316,7 @@ export async function runAgent(
     const completion = await generator.run([
       {
         role: "system",
-        content: defences.sanitiseDocuments ? `${SYSTEM_PROMPT}\n\n${DATA_RULE}` : SYSTEM_PROMPT,
+        content: defences.sanitiseDocuments ? `${prompt}\n\n${DATA_RULE}` : prompt,
       },
       { role: "user", content: renderTranscript(question, steps) },
     ]);
@@ -293,10 +329,12 @@ export async function runAgent(
       fields: Pick<AgentStep, "thought" | "action" | "input" | "observation">,
       toolMs = 0,
       stepRedactions: string[] = [],
+      server: string | null = null,
     ) => {
       const step: AgentStep = {
         step: steps.length + 1,
         ...fields,
+        server,
         redactions: stepRedactions,
         usage: completion.usage,
         modelMs: completion.ms,
@@ -345,32 +383,31 @@ export async function runAgent(
     }
     seen.add(signature);
 
-    const tool = TOOLS.find((candidate) => candidate.name === parsed.action);
+    const tool = tools.find((candidate) => candidate.name === parsed.action);
     if (!tool) {
       record({
         ...parsed,
-        observation: `There is no tool "${parsed.action}". Tools: ${[...TOOLS, FINISH].map((t) => t.name).join(", ")}.`,
+        observation: `There is no tool "${parsed.action}". Tools: ${[...tools, FINISH].map((t) => t.name).join(", ")}.`,
       });
       continue;
     }
 
     const toolStarted = Date.now();
-    const result = await tool.execute(parsed.input);
+    const result = await tool.call(parsed.input);
     const toolMs = Date.now() - toolStarted;
     activeMs += toolMs;
 
-    for (const clause of result.clauses) {
-      clauses.set(clause.id, clause);
-      labels.add(await clauseLabel(clause));
-    }
+    // Clause labels are read from the text itself, whichever server sent it.
+    for (const label of citationsIn(result.text)) labels.add(label);
 
-    if (parsed.action === "find_amendments") {
+    // Tools are discovered, so no name is fixed: any amendment tool counts.
+    if (/amendment/i.test(tool.name)) {
       amendmentsChecked.add(String(parsed.input.contract_id ?? "").trim().toUpperCase());
     }
 
     // What a tool returns is document text: scanned, stripped, and fenced off
     // as data before the model ever sees it.
-    let observation = result.observation;
+    let observation = result.isError ? `Tool error: ${result.text}` : result.text;
     let stepRedactions: string[] = [];
 
     if (defences.sanitiseDocuments) {
@@ -380,6 +417,6 @@ export async function runAgent(
       observation = asUntrustedData(scan.clean);
     }
 
-    record({ ...parsed, observation }, toolMs, stepRedactions);
+    record({ ...parsed, observation }, toolMs, stepRedactions, tool.server);
   }
 }

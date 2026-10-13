@@ -4,24 +4,37 @@
  *   npm run agent -- "What is the combined retainer of Rohan Sharma and Dinesh Mendis?"
  *   npm run agent -- --workflow "..."     the fixed workflow instead
  *   npm run agent -- --max-steps 3 "..."  tighter limit, to see a safe stop
+ *   npm run agent -- --save trace.json "..."  also write the whole run as JSON
+ *
+ * Week 9: the agent's tools come from the MCP servers in mcp.config.json (or
+ * MCP_CONFIG). Each step shows which server ran the tool.
  */
 import "./env.mts";
+import { writeFileSync } from "fs";
 
 const { runAgent } = await import("../lib/agent");
 const { runWorkflow } = await import("../lib/workflow");
 const { resolveGenerator } = await import("../lib/generator");
+const { closeTools, configPath, connectFromConfig } = await import("../lib/mcp-client");
 
 const args = process.argv.slice(2);
 const useWorkflow = args.includes("--workflow");
-const maxStepsIndex = args.indexOf("--max-steps");
-const maxSteps = maxStepsIndex === -1 ? undefined : Number(args[maxStepsIndex + 1]);
+const valueOf = (flag: string) => {
+  const index = args.indexOf(flag);
+  return index === -1 ? undefined : args[index + 1];
+};
+const flagValues = new Set(
+  ["--max-steps", "--save"].map((flag) => args.indexOf(flag)).filter((i) => i !== -1).map((i) => i + 1),
+);
+const maxSteps = valueOf("--max-steps") ? Number(valueOf("--max-steps")) : undefined;
+const saveTo = valueOf("--save");
 const question = args
-  .filter((arg, index) => !arg.startsWith("--") && (maxStepsIndex === -1 || index !== maxStepsIndex + 1))
+  .filter((arg, index) => !arg.startsWith("--") && !flagValues.has(index))
   .join(" ")
   .trim();
 
 if (!question) {
-  console.error('Usage: npm run agent -- [--workflow] [--max-steps N] "your question"');
+  console.error('Usage: npm run agent -- [--workflow] [--max-steps N] [--save file.json] "your question"');
   process.exit(1);
 }
 
@@ -38,12 +51,20 @@ if (useWorkflow) {
   console.log(`\nAnswer: ${run.answer}\n`);
   console.log(`1 model call · ${run.usage.inputTokens + run.usage.outputTokens} tokens · ${(run.activeMs / 1000).toFixed(1)}s active · ${(run.wallMs / 1000).toFixed(1)}s wall\n`);
 } else {
+  const connection = await connectFromConfig();
+  console.log(`MCP config ${configPath().replace(`${process.cwd()}/`, "")} → ${connection.tools.length} tools discovered via tools/list:`);
+  for (const server of connection.servers) {
+    console.log(`  ${server.name.padEnd(20)} ${server.tools.map((tool) => tool.name).join(", ")}`);
+  }
+  for (const { name } of connection.failed) console.log(`  ${name.padEnd(20)} (did not start)`);
+  console.log();
+
   const run = await runAgent(question, {
     limits: maxSteps ? { maxSteps } : undefined,
     onStep: (step) => {
       console.log(`Step ${step.step}`);
       console.log(`  thought    ${indent(step.thought)}`);
-      console.log(`  action     ${step.action} ${JSON.stringify(step.input)}`);
+      console.log(`  action     ${step.action} ${JSON.stringify(step.input)}${step.server ? `   [mcp: ${step.server}]` : ""}`);
       console.log(`  observed   ${indent(clip(step.observation))}`);
       console.log(`  cost       ${step.usage.inputTokens} in / ${step.usage.outputTokens} out tokens · model ${step.modelMs} ms · tool ${step.toolMs} ms\n`);
     },
@@ -52,4 +73,14 @@ if (useWorkflow) {
   console.log(`Stopped: ${run.stopReason}`);
   console.log(`Answer: ${run.answer ?? "(none — the run stopped before finishing)"}\n`);
   console.log(`${run.llmCalls} model calls · ${run.usage.inputTokens + run.usage.outputTokens} tokens · ${(run.activeMs / 1000).toFixed(1)}s active · ${(run.wallMs / 1000).toFixed(1)}s wall\n`);
+
+  if (saveTo) {
+    writeFileSync(
+      saveTo,
+      JSON.stringify({ ranAt: new Date().toISOString(), generator: resolveGenerator().label, mcpConfig: configPath().replace(`${process.cwd()}/`, ""), ...run }, null, 2),
+    );
+    console.log(`saved → ${saveTo}\n`);
+  }
 }
+
+await closeTools();

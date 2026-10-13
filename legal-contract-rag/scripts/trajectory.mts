@@ -11,6 +11,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 
 const { runAgent } = await import("../lib/agent");
+const { closeTools } = await import("../lib/mcp-client");
 const { ALL_DEFENCES, NO_DEFENCES } = await import("../lib/defences");
 const { checkAnswer } = await import("../lib/assertions");
 const { RACE_SET } = await import("../lib/race-set");
@@ -209,3 +210,6 @@ for (const [name, count] of Object.entries(failureCounts).sort((a, b) => b[1] - 
 
 save(results);
 console.log(`\n  saved → evals/${path.basename(outfile)}\n`);
+
+// The MCP servers are child processes; the script cannot exit while they run.
+await closeTools();

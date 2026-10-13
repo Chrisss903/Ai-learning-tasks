@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "clause-search": {
+      "command": "npx",
+      "args": ["tsx", "mcp/clause-search/server.mts"]
+    }
+  }
+}

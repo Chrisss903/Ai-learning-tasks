@@ -11,6 +11,7 @@ import { mkdirSync, writeFileSync } from "fs";
 import path from "path";
 
 const { runAgent } = await import("../lib/agent");
+const { closeTools } = await import("../lib/mcp-client");
 const { runWorkflow } = await import("../lib/workflow");
 const { checkAnswer } = await import("../lib/assertions");
 const { RACE_SET } = await import("../lib/race-set");
@@ -219,3 +220,6 @@ writeFileSync(
   ),
 );
 console.log(`\n  saved → evals/${path.basename(outfile)}\n`);
+
+// The MCP servers are child processes; the script cannot exit while they run.
+await closeTools();
