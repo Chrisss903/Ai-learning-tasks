@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "clause-search": {
+      "command": "npx",
+      "args": ["tsx", "mcp/clause-search/server.mts"]
+    },
+    "contract-repository": {
+      "command": "npx",
+      "args": ["tsx", "vendor/contract-repository-mcp/server.mts"],
+      "env": {
+        "CONTRACT_REPO_DIR": "documents",
+        "CONTRACT_REPO_TOKEN": "${CONTRACT_REPO_TOKEN}"
+      }
+    }
+  },
+  "callers": {
+    "sha256:c6c8378ebfe680919c7ea926efa2f4fb84f056e941411ef362e1e9614856239c": {
+      "caller": "legal-research-agent",
+      "allow": ["*"]
+    },
+    "sha256:d1a6201d9d6c3ba1528a4135bea0628ba3ed792d4a35277043ed0dbac7f3995d": {
+      "caller": "renewal-review-agent",
+      "allow": [
+        "clause-search/*",
+        "contract-repository/get_contract",
+        "contract-repository/get_effective_date"
+      ]
+    }
+  }
+}

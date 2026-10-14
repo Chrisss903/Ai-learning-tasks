@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "gateway": {
+      "command": "npx",
+      "args": ["tsx", "mcp/gateway/server.mts"],
+      "env": {
+        "GATEWAY_TOKEN": "${GATEWAY_TOKEN}",
+        "CONTRACT_REPO_TOKEN": "${CONTRACT_REPO_TOKEN}"
+      }
+    }
+  }
+}
