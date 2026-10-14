@@ -1,0 +1,56 @@
+{
+  "ranAt": "2026-10-13T15:04:02.020Z",
+  "generator": "gemini:gemini-3.5-flash-lite",
+  "mcpConfig": "mcp.config.json",
+  "question": "In PC-2026-027, what happens to the player's retainer if he is injured during the season?",
+  "answer": null,
+  "stopReason": "time-budget",
+  "steps": [
+    {
+      "step": 1,
+      "thought": "I need to find out what happens to the player's retainer in contract PC-2026-027 if he is injured during the season. I will search for clauses related to injury and retainer in PC-2026-027, and also check for any amendments that might modify this.",
+      "action": "search_clauses",
+      "input": {
+        "contract_id": "PC-2026-027",
+        "query": "injury retainer"
+      },
+      "observation": "The search index is unreachable (vector store: ECONNRESET). This is an outage on the search side, not a sign that PC-2026-027 lacks such a clause, and repeating this call — reworded or not — will not help.\nKeyword-only matches (they share your words; a clause worded differently can be missed):\n\n[PC-2026-027 §9] 9. INJURY AND MEDICAL\n\nIf the Player is injured during Franchise Activity, the\nFranchise pays the retainer in full for the season. A\nreplacement player may be signed without further liability to\nthe Player.\n\n[PC-2026-027 §4] 4. RETAINER FEE\n\nThe Franchise will pay the Player an annual retainer of\n6,500,000 Indian rupees, payable in two equal instalments on\n1 March and 1 June.\n\n[PC-2026-027 §5] 5. MATCH FEES\n\nIn addition to the retainer, the Player receives a Match Fee of\n110,000 Indian rupees for each match in which he is named in the\nplaying eleven.\n\nIf none of these answers the question: read_section needs no index — PC-2026-027's sections are: §1 PARTIES; §2 DEFINITIONS; §3 CONTRACT TERM; §4 RETAINER FEE; §5 MATCH FEES; §6 PLAYER AVAILABILITY; §7 IMAGE RIGHTS; §8 TERMINATION; §9 INJURY AND MEDICAL; §10 CODE OF CONDUCT; §11 GOVERNING LAW AND DISPUTES.",
+      "server": "clause-search",
+      "redactions": [],
+      "usage": {
+        "inputTokens": 1104,
+        "outputTokens": 106
+      },
+      "modelMs": 47471,
+      "toolMs": 2460
+    }
+  ],
+  "llmCalls": 1,
+  "usage": {
+    "inputTokens": 1104,
+    "outputTokens": 106
+  },
+  "activeMs": 49931,
+  "wallMs": 517841,
+  "tools": [
+    "list_contracts",
+    "search_clauses",
+    "read_section",
+    "find_amendments",
+    "get_contract",
+    "get_effective_date",
+    "get_amendment_chain"
+  ],
+  "observedLabels": [
+    "PC-2026-027 §9",
+    "PC-2026-027 §4",
+    "PC-2026-027 §5"
+  ],
+  "defences": {
+    "sanitiseDocuments": false,
+    "validateCitations": false,
+    "requireAmendmentCheck": false
+  },
+  "redactions": [],
+  "gateRejections": []
+}

@@ -1,0 +1,115 @@
+{
+  "listedAt": "2026-10-13T12:55:45.514Z",
+  "config": "mcp.config.json",
+  "count": 4,
+  "names": [
+    "list_contracts",
+    "search_clauses",
+    "read_section",
+    "find_amendments"
+  ],
+  "servers": [
+    {
+      "name": "clause-search",
+      "info": {
+        "name": "clause-search",
+        "version": "1.0.0"
+      },
+      "tools": [
+        {
+          "name": "list_contracts",
+          "title": "List contracts",
+          "description": "Lists every document in the store: id, title, and its first section (the parties, or what an amendment modifies). Use it first when the question names a person, company, or venue instead of a contract id — clauses almost never repeat the names, so you need the id to scope a search.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "search_clauses",
+          "title": "Search clauses",
+          "description": "Hybrid keyword + semantic search over clauses; returns the top 3, each labelled [CONTRACT-ID §N]. Pass contract_id whenever you know which contract the question is about — the two player contracts share almost identical wording, and an unscoped search often returns the other player's clause. Leave contract_id out only to discover which document covers a topic.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string"
+              },
+              "contract_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "read_section",
+          "title": "Read a section",
+          "description": "Returns the full text of one numbered section of one contract. Use it when a clause refers to another section (\"the term set out in Section 2\") or you know exactly which section you need.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "contract_id": {
+                "type": "string"
+              },
+              "section": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "contract_id",
+              "section"
+            ],
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "find_amendments",
+          "title": "Find amendments",
+          "description": "Returns every amendment that modifies the given contract, with its full text. Call it before answering with any fee, date, or notice period from a contract: an amendment may have replaced the value, and the amendment wins.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "contract_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "contract_id"
+            ],
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        }
+      ]
+    }
+  ],
+  "failed": []
+}

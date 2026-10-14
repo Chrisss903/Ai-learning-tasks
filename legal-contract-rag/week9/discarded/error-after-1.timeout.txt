@@ -1,0 +1,34 @@
+
+Agent · gemini:gemini-3.5-flash-lite
+Question: In PC-2026-027, what happens to the player's retainer if he is injured during the season?
+
+Failed to obtain server version. Unable to check client-server compatibility. Set checkCompatibility=false to skip version check.
+MCP config mcp.config.json → 7 tools discovered via tools/list:
+  clause-search        list_contracts, search_clauses, read_section, find_amendments
+  contract-repository  get_contract, get_effective_date, get_amendment_chain
+
+Step 1
+  thought    I need to find out what happens to the player's retainer in contract PC-2026-027 if he is injured during the season. I will search for clauses related to injury and retainer in PC-2026-027, and also check for any amendments that might modify this.
+  action     search_clauses {"contract_id":"PC-2026-027","query":"injury retainer"}   [mcp: clause-search]
+  observed   The search index is unreachable (vector store: ECONNRESET). This is an outage on the search side, not a sign that PC-2026-027 lacks such a clause, and repeating this call — reworded or not — will not help.
+             Keyword-only matches (they share your words; a clause worded differently can be missed):
+             
+             [PC-2026-027 §9] 9. INJURY AND MEDICAL
+             
+             If the Player is injured during Franchise Activity, the
+             Franchise pays the retainer in full for the season. A
+             replacement player may be signed without further liability to
+             the Player.
+             
+             [PC-2026-027 §4] 4. RETAINER FEE
+             
+             The Franchise will pay the Player an annual r…
+  cost       1104 in / 106 out tokens · model 47471 ms · tool 2460 ms
+
+Stopped: time-budget
+Answer: (none — the run stopped before finishing)
+
+1 model calls · 1210 tokens · 49.9s active · 517.8s wall
+
+saved → week9/error-after-1.json
+

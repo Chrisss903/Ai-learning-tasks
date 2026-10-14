@@ -1,0 +1,238 @@
+{
+  "about": "The raw JSON-RPC between our agent's MCP client and the contract-repository server, over stdio. It was captured with MCP_WIRE_LOG during the requirement-1 run (week9/trace-bolt-on.txt; unfiltered capture of both servers in week9/wire.raw.jsonl). 'message' is each message exactly as sent. 'annotations' are written by hand, one per top-level field.",
+  "model_call": "The model (Gemini, called by generator.run in lib/agent.ts) runs only in the host: three times in the 107 s between message 5 and message 6 (it chose search_clauses, repeated it, then chose this get_amendment_chain call) and once after message 7 (to write the answer). No message on this wire is a model call, and the contract-repository server never calls a model.",
+  "exchange": [
+    {
+      "what": "1. initialize: request",
+      "at": "2026-10-13T13:12:23.804Z",
+      "direction": "client→server",
+      "message": {
+        "method": "initialize",
+        "params": {
+          "protocolVersion": "2025-11-25",
+          "capabilities": {},
+          "clientInfo": {
+            "name": "contract-agent",
+            "version": "9.0.0"
+          }
+        },
+        "jsonrpc": "2.0",
+        "id": 0
+      },
+      "annotations": {
+        "method": "\"initialize\" is always the first message. Our client (inside the host) opens the session, and nothing else may be sent until it is answered.",
+        "params": "What the client brings to the negotiation: a protocol version, its capabilities, and who it is.",
+        "params.protocolVersion": "\"2025-11-25\" is the newest MCP revision the SDK we run (1.32.1) speaks. The server must answer with this version or one it supports.",
+        "params.capabilities": "{} means our client offers servers nothing back: no sampling (a server asking the host to run the model for it), no roots, no elicitation. So this server cannot get our model to run even if it wanted to.",
+        "params.clientInfo": "Our host's client name and version. It's informational only, not authentication, and the server cannot verify it.",
+        "jsonrpc": "\"2.0\" on every message: MCP is JSON-RPC 2.0, one JSON object per line on the server's stdin (client→server) and stdout (server→client).",
+        "id": "0 is a request id, and the response must echo it. Ids are per connection: clause-search's connection also started at 0."
+      }
+    },
+    {
+      "what": "2. initialize: result",
+      "at": "2026-10-13T13:12:25.637Z",
+      "direction": "server→client",
+      "message": {
+        "jsonrpc": "2.0",
+        "id": 0,
+        "result": {
+          "protocolVersion": "2025-11-25",
+          "capabilities": {
+            "tools": {
+              "listChanged": true
+            }
+          },
+          "serverInfo": {
+            "name": "contract-repository",
+            "version": "2.3.0"
+          },
+          "instructions": "Knowledge team contract repository. Read-only lookups of executed documents by id: the record itself, its effective date, and its amendment chain."
+        }
+      },
+      "annotations": {
+        "jsonrpc": "\"2.0\" on every message: MCP is JSON-RPC 2.0, one JSON object per line on the server's stdin (client→server) and stdout (server→client).",
+        "id": "0 echoes request 1, so this is its answer. It arrived 1.8 s later, mostly npx/tsx starting the server process.",
+        "result": "This is a success. A failure would come back under \"error\" (code + message) instead of \"result\".",
+        "result.protocolVersion": "The server accepts 2025-11-25, so both sides now speak that revision.",
+        "result.capabilities": "{tools:{listChanged:true}}: this server offers tools only, with no resources and no prompts, and may notify us if its tool list changes. There is no model-related capability anywhere in it.",
+        "result.serverInfo": "contract-repository 2.3.0, self-reported and unverified. A hostile server can claim any name; trust comes from our config file, not from this field.",
+        "result.instructions": "Optional free text the server would like in the model's context. Our agent never forwards it to the model: it is third-party text, so it is a prompt-injection surface."
+      }
+    },
+    {
+      "what": "3. notifications/initialized",
+      "at": "2026-10-13T13:12:25.643Z",
+      "direction": "client→server",
+      "message": {
+        "method": "notifications/initialized",
+        "jsonrpc": "2.0"
+      },
+      "annotations": {
+        "method": "The client confirms the handshake is done. Only after this may ordinary requests flow.",
+        "jsonrpc": "\"2.0\" on every message: MCP is JSON-RPC 2.0, one JSON object per line on the server's stdin (client→server) and stdout (server→client).",
+        "id (absent)": "There is no id because this is a notification: no response is expected, and none is sent."
+      }
+    },
+    {
+      "what": "4. tools/list: request",
+      "at": "2026-10-13T13:12:25.644Z",
+      "direction": "client→server",
+      "message": {
+        "method": "tools/list",
+        "jsonrpc": "2.0",
+        "id": 1
+      },
+      "annotations": {
+        "method": "\"tools/list\" is discovery. It replaces the hard-coded tool list: the agent learns these three tools exist only from the answer.",
+        "jsonrpc": "\"2.0\" on every message: MCP is JSON-RPC 2.0, one JSON object per line on the server's stdin (client→server) and stdout (server→client).",
+        "id": "1 is the next request id on this connection.",
+        "params (absent)": "No cursor, so this asks for the first page. lib/mcp-client.ts keeps asking while the result carries a nextCursor."
+      }
+    },
+    {
+      "what": "5. tools/list: result",
+      "at": "2026-10-13T13:12:25.653Z",
+      "direction": "server→client",
+      "message": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "tools": [
+            {
+              "name": "get_contract",
+              "title": "Get contract by id",
+              "description": "Looks up one executed document by its id and returns its record: title, kind, effective date, the amendments recorded against it, and its full text as executed. The text is the original — amendments are listed but NOT applied; use get_amendment_chain for what changed.",
+              "inputSchema": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "properties": {
+                  "contract_id": {
+                    "type": "string",
+                    "description": "Document id as printed in its header, e.g. SA-2026-001."
+                  }
+                },
+                "required": [
+                  "contract_id"
+                ]
+              },
+              "annotations": {
+                "readOnlyHint": true
+              },
+              "execution": {
+                "taskSupport": "forbidden"
+              }
+            },
+            {
+              "name": "get_effective_date",
+              "title": "Get effective date",
+              "description": "Returns the date a document took effect, quoting the clause that says so, plus the dates its amendments took effect. When a document states no calendar date, says so and quotes its term clause instead.",
+              "inputSchema": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "properties": {
+                  "contract_id": {
+                    "type": "string",
+                    "description": "Document id, e.g. AMD-2026-001 or SA-2026-001."
+                  }
+                },
+                "required": [
+                  "contract_id"
+                ]
+              },
+              "annotations": {
+                "readOnlyHint": true
+              },
+              "execution": {
+                "taskSupport": "forbidden"
+              }
+            },
+            {
+              "name": "get_amendment_chain",
+              "title": "Get amendment chain",
+              "description": "Returns every amendment recorded against a contract, oldest first, with each one's effective date, the sections it replaces, and its text. Pass as_of (YYYY-MM-DD) to see which amendments were in force on that date.",
+              "inputSchema": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "properties": {
+                  "contract_id": {
+                    "type": "string",
+                    "description": "Id of the original contract, not of an amendment."
+                  },
+                  "as_of": {
+                    "description": "Date to evaluate the chain on, YYYY-MM-DD. Defaults to today.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "contract_id"
+                ]
+              },
+              "annotations": {
+                "readOnlyHint": true
+              },
+              "execution": {
+                "taskSupport": "forbidden"
+              }
+            }
+          ]
+        }
+      },
+      "annotations": {
+        "jsonrpc": "\"2.0\" on every message: MCP is JSON-RPC 2.0, one JSON object per line on the server's stdin (client→server) and stdout (server→client).",
+        "id": "1 echoes request 4.",
+        "result.tools": "Three tool definitions. Each has: name (what the model writes in its action); title (for humans); description (the only thing the model knows about when to use the tool, so the docstring is a prompt); inputSchema (JSON Schema generated from the server's zod, which our host renders into the system prompt); annotations.readOnlyHint (a claim the server makes about itself that nobody enforces); execution.taskSupport (SDK 1.32 field: not runnable as a long-running task).",
+        "result.nextCursor (absent)": "No cursor, so this is the whole list. These 3 tools plus the 4 from clause-search are the 7 the agent was given."
+      }
+    },
+    {
+      "what": "6. tools/call: request",
+      "at": "2026-10-13T13:14:13.127Z",
+      "direction": "client→server",
+      "message": {
+        "method": "tools/call",
+        "params": {
+          "name": "get_amendment_chain",
+          "arguments": {
+            "contract_id": "SA-2026-001",
+            "as_of": "2026-10-15"
+          }
+        },
+        "jsonrpc": "2.0",
+        "id": 2
+      },
+      "annotations": {
+        "method": "\"tools/call\" runs one tool. The client sends it only because the model, in its step-3 reply, chose this action; the client just forwards it. The 107 s gap since message 5 is the host calling the model three times.",
+        "params": "Which tool to run, and with what.",
+        "params.name": "get_amendment_chain is the model's choice, verbatim.",
+        "params.arguments": "The model's arguments, verbatim. It took as_of=2026-10-15 from the question. The server validates them against the inputSchema it published in message 5.",
+        "jsonrpc": "\"2.0\" on every message: MCP is JSON-RPC 2.0, one JSON object per line on the server's stdin (client→server) and stdout (server→client).",
+        "id": "2 is the next request id."
+      }
+    },
+    {
+      "what": "7. tools/call: result",
+      "at": "2026-10-13T13:14:13.209Z",
+      "direction": "server→client",
+      "message": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Amendment chain for SA-2026-001 (effective 2026-08-01), oldest first, evaluated on 2026-10-15:\n\n1. AMD-2026-001 — effective 2026-10-01 — replaces §5 TERMINATION — IN FORCE on 2026-10-15\n[AMD-2026-001 §1] 1. PURPOSE\n\nThis amendment modifies specific provisions of the\nService Agreement SA-2026-001.\n[AMD-2026-001 §2] 2. TERMINATION NOTICE\n\nSection 5 of the original Service Agreement is hereby\namended.\n\nThe original termination notice period of 30 days is\nreplaced with a termination notice period of 60 days.\n\nThe updated requirement is therefore:\n\nEither party must provide 60 days written notice\nbefore terminating the agreement.\n[AMD-2026-001 §3] 3. EFFECTIVE DATE OF AMENDMENT\n\nThis amendment becomes effective on October 1, 2026.\n[AMD-2026-001 §4] 4. OTHER TERMS\n\nAll other provisions of the original Service Agreement\nremain unchanged and continue to remain in effect.\n[AMD-2026-001 §5] 5. PRIORITY\n\nIf there is a conflict between this amendment and the\noriginal Service Agreement regarding the termination\nnotice period, this amendment shall take precedence."
+            }
+          ]
+        }
+      },
+      "annotations": {
+        "jsonrpc": "\"2.0\" on every message: MCP is JSON-RPC 2.0, one JSON object per line on the server's stdin (client→server) and stdout (server→client).",
+        "id": "2 echoes request 6. The answer took 82 ms on the wire; the server's own log says 3 ms of work.",
+        "result.content": "A list of content blocks, here one text block. The host joins the text blocks and hands them to the model as the step-3 observation.",
+        "result.isError (absent)": "Absent means success. A tool failure (unknown id, a date before the contract took effect) also arrives here, as isError:true plus text: a normal result the model can read and recover from. A JSON-RPC \"error\" object is kept for protocol failures such as an unknown tool or invalid params.",
+        "result.structuredContent (absent)": "This server returns plain text only, with no machine-readable copy. Our agent reads [ID §N] clause labels out of the text, so citations from this server can be checked too."
+      }
+    }
+  ]
+}
