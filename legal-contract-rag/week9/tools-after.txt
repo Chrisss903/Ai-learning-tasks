@@ -1,0 +1,18 @@
+
+MCP config: mcp.config.json
+
+clause-search  (initialize → clause-search 1.0.0)  4 tool(s) from tools/list
+  - list_contracts
+  - search_clauses
+  - read_section
+  - find_amendments
+
+contract-repository  (initialize → contract-repository 2.3.0)  3 tool(s) from tools/list
+  - get_contract
+  - get_effective_date
+  - get_amendment_chain
+
+7 tools: list_contracts, search_clauses, read_section, find_amendments, get_contract, get_effective_date, get_amendment_chain
+
+saved → week9/tools-after.json
+

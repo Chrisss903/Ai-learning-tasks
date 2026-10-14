@@ -1,0 +1,203 @@
+{
+  "listedAt": "2026-10-13T12:58:49.495Z",
+  "config": "mcp.config.json",
+  "count": 7,
+  "names": [
+    "list_contracts",
+    "search_clauses",
+    "read_section",
+    "find_amendments",
+    "get_contract",
+    "get_effective_date",
+    "get_amendment_chain"
+  ],
+  "servers": [
+    {
+      "name": "clause-search",
+      "info": {
+        "name": "clause-search",
+        "version": "1.0.0"
+      },
+      "tools": [
+        {
+          "name": "list_contracts",
+          "title": "List contracts",
+          "description": "Lists every document in the store: id, title, and its first section (the parties, or what an amendment modifies). Use it first when the question names a person, company, or venue instead of a contract id — clauses almost never repeat the names, so you need the id to scope a search.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "search_clauses",
+          "title": "Search clauses",
+          "description": "Hybrid keyword + semantic search over clauses; returns the top 3, each labelled [CONTRACT-ID §N]. Pass contract_id whenever you know which contract the question is about — the two player contracts share almost identical wording, and an unscoped search often returns the other player's clause. Leave contract_id out only to discover which document covers a topic.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string"
+              },
+              "contract_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "read_section",
+          "title": "Read a section",
+          "description": "Returns the full text of one numbered section of one contract. Use it when a clause refers to another section (\"the term set out in Section 2\") or you know exactly which section you need.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "contract_id": {
+                "type": "string"
+              },
+              "section": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "contract_id",
+              "section"
+            ],
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "find_amendments",
+          "title": "Find amendments",
+          "description": "Returns every amendment that modifies the given contract, with its full text. Call it before answering with any fee, date, or notice period from a contract: an amendment may have replaced the value, and the amendment wins.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "contract_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "contract_id"
+            ],
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        }
+      ]
+    },
+    {
+      "name": "contract-repository",
+      "info": {
+        "name": "contract-repository",
+        "version": "2.3.0"
+      },
+      "tools": [
+        {
+          "name": "get_contract",
+          "title": "Get contract by id",
+          "description": "Looks up one executed document by its id and returns its record: title, kind, effective date, the amendments recorded against it, and its full text as executed. The text is the original — amendments are listed but NOT applied; use get_amendment_chain for what changed.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "contract_id": {
+                "type": "string",
+                "description": "Document id as printed in its header, e.g. SA-2026-001."
+              }
+            },
+            "required": [
+              "contract_id"
+            ],
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "get_effective_date",
+          "title": "Get effective date",
+          "description": "Returns the date a document took effect, quoting the clause that says so, plus the dates its amendments took effect. When a document states no calendar date, says so and quotes its term clause instead.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "contract_id": {
+                "type": "string",
+                "description": "Document id, e.g. AMD-2026-001 or SA-2026-001."
+              }
+            },
+            "required": [
+              "contract_id"
+            ],
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "get_amendment_chain",
+          "title": "Get amendment chain",
+          "description": "Returns every amendment recorded against a contract, oldest first, with each one's effective date, the sections it replaces, and its text. Pass as_of (YYYY-MM-DD) to see which amendments were in force on that date.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "contract_id": {
+                "type": "string",
+                "description": "Id of the original contract, not of an amendment."
+              },
+              "as_of": {
+                "description": "Date to evaluate the chain on, YYYY-MM-DD. Defaults to today.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "contract_id"
+            ],
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        }
+      ]
+    }
+  ],
+  "failed": []
+}

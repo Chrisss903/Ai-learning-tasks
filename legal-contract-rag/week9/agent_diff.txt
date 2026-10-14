@@ -1,0 +1,57 @@
+Requirement 2: the agent module did not change when server two was added
+
+server one          = 6598cce  week-9: agent discovers its tools over MCP from its own clause-search server
+server one plus two = f86939b  week-9 F: bolt on the contract-repository server — config only
+
+The agent module is every file the agent runs:
+  lib/agent.ts        the ReAct loop; builds its prompt from whatever tools/list returned
+  lib/mcp-client.ts   reads mcp.config.json, starts each server, runs initialize + tools/list, forwards tools/call
+  scripts/agent.mts   the entry point (npm run agent)
+
+RESULT: 0 changed lines in the agent module (0 insertions, 0 deletions, 0 files).
+
+=== 1. The agent module, server one -> server one plus two
+$ git diff --stat 6598cce f86939b -- lib/agent.ts lib/mcp-client.ts scripts/agent.mts
+(no output: nothing differs)
+
+$ git diff 6598cce f86939b -- lib/agent.ts lib/mcp-client.ts scripts/agent.mts
+(no output: nothing differs)
+
+Line count of that diff: 0
+
+=== 2. Wider: all of lib/, scripts/, app/ and the dependencies
+$ git diff --stat 6598cce f86939b -- lib scripts app package.json package-lock.json
+(no output: nothing differs)
+
+=== 3. Identical bytes: each agent file has the same git blob id in both commits
+  lib/agent.ts  6598cce:a522aa6  f86939b:a522aa6
+  lib/mcp-client.ts  6598cce:3ea9e16  f86939b:3ea9e16
+  scripts/agent.mts  6598cce:7223a9b  f86939b:7223a9b
+
+=== 4. What did change between the two states
+    vendor/ is the knowledge team's server, vendored in its own commit (8570c34), not wired in by itself.
+    mcp.config.json is the bolt-on.
+$ git diff --stat 6598cce f86939b
+ legal-contract-rag/mcp.config.json                 |   8 +
+ .../vendor/contract-repository-mcp/README.md       |  30 +++
+ .../vendor/contract-repository-mcp/server.mts      | 297 +++++++++++++++++++++
+ 3 files changed, 335 insertions(+)
+
+=== 5. The bolt-on commit on its own: config only
+$ git show --stat --format=%h %s f86939b
+f86939b week-9 F: bolt on the contract-repository server — config only
+
+ legal-contract-rag/mcp.config.json | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+=== 6. Still unchanged at 9e53703 (after the docstring rewrite, the generator retry fix and the gateway)
+$ git diff --stat 6598cce 9e53703 -- lib/agent.ts lib/mcp-client.ts scripts/agent.mts
+(no output: nothing differs)
+
+Later commits changed only these files outside the agent module:
+   legal-contract-rag/lib/generator.ts             |   7 +-
+   legal-contract-rag/mcp.frontdoor.json           |  12 ++
+   legal-contract-rag/mcp.gateway.json             |  30 +++++
+   legal-contract-rag/mcp/clause-search/server.mts |  82 ++++++++++---
+   legal-contract-rag/mcp/gateway/server.mts       | 148 ++++++++++++++++++++++++
+   5 files changed, 264 insertions(+), 15 deletions(-)

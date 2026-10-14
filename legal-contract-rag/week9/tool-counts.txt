@@ -1,0 +1,14 @@
+Tool count from tools/list: 4 before -> 7 after
+
+Every name below came back from the servers' own tools/list replies (saved by
+npm run mcp:tools -- --save). None was typed in by hand. Raw replies are in
+tools-before.json and tools-after.json.
+
+before  (commit 6598cce, mcp.config.json = clause-search; listed 2026-10-13T12:55:45.514Z)
+  clause-search (clause-search 1.0.0): list_contracts, search_clauses, read_section, find_amendments
+
+after   (commit f86939b, mcp.config.json = clause-search + contract-repository; listed 2026-10-13T12:58:49.495Z)
+  clause-search (clause-search 1.0.0): list_contracts, search_clauses, read_section, find_amendments
+  contract-repository (contract-repository 2.3.0): get_contract, get_effective_date, get_amendment_chain
+
+added: get_contract, get_effective_date, get_amendment_chain (+3)

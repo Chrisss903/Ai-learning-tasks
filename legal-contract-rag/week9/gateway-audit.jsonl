@@ -1,0 +1,4 @@
+{"at":"2026-10-14T06:00:47.610Z","caller":"renewal-review-agent","contract_id":"SA-2026-001","tool":"clause-search/search_clauses","decision":"allow","outcome":"ok","ms":1927}
+{"at":"2026-10-14T06:00:51.217Z","caller":"renewal-review-agent","contract_id":"SA-2026-001","tool":"contract-repository/get_amendment_chain","decision":"deny"}
+{"at":"2026-10-14T06:01:05.379Z","caller":"legal-research-agent","contract_id":"SA-2026-001","tool":"clause-search/search_clauses","decision":"allow","outcome":"ok","ms":1669}
+{"at":"2026-10-14T06:01:10.546Z","caller":"legal-research-agent","contract_id":"SA-2026-001","tool":"contract-repository/get_amendment_chain","decision":"allow","outcome":"ok","ms":24}

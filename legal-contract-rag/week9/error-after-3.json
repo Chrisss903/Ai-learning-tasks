@@ -1,0 +1,90 @@
+{
+  "ranAt": "2026-10-14T05:57:27.562Z",
+  "generator": "gemini:gemini-3.5-flash-lite",
+  "mcpConfig": "mcp.config.json",
+  "question": "In PC-2026-027, what happens to the player's retainer if he is injured during the season?",
+  "answer": "If the player is injured during Franchise Activity, the Franchise pays the retainer in full for the season [PC-2026-027 §9].",
+  "stopReason": "finished",
+  "steps": [
+    {
+      "step": 1,
+      "thought": "I need to find out what happens to the player's retainer in contract PC-2026-027 if he is injured during the season. I will search for clauses related to injury and retainer in contract PC-2026-027, and also check for any amendments.",
+      "action": "search_clauses",
+      "input": {
+        "contract_id": "PC-2026-027",
+        "query": "injury retainer"
+      },
+      "observation": "The search index is unreachable (vector store: ECONNRESET). This is an outage on the search side, not a sign that PC-2026-027 lacks such a clause, and repeating this call — reworded or not — will not help.\nKeyword-only matches (they share your words; a clause worded differently can be missed):\n\n[PC-2026-027 §9] 9. INJURY AND MEDICAL\n\nIf the Player is injured during Franchise Activity, the\nFranchise pays the retainer in full for the season. A\nreplacement player may be signed without further liability to\nthe Player.\n\n[PC-2026-027 §4] 4. RETAINER FEE\n\nThe Franchise will pay the Player an annual retainer of\n6,500,000 Indian rupees, payable in two equal instalments on\n1 March and 1 June.\n\n[PC-2026-027 §5] 5. MATCH FEES\n\nIn addition to the retainer, the Player receives a Match Fee of\n110,000 Indian rupees for each match in which he is named in the\nplaying eleven.\n\nIf none of these answers the question: read_section needs no index — PC-2026-027's sections are: §1 PARTIES; §2 DEFINITIONS; §3 CONTRACT TERM; §4 RETAINER FEE; §5 MATCH FEES; §6 PLAYER AVAILABILITY; §7 IMAGE RIGHTS; §8 TERMINATION; §9 INJURY AND MEDICAL; §10 CODE OF CONDUCT; §11 GOVERNING LAW AND DISPUTES.",
+      "server": "clause-search",
+      "redactions": [],
+      "usage": {
+        "inputTokens": 1104,
+        "outputTokens": 103
+      },
+      "modelMs": 1301,
+      "toolMs": 1879
+    },
+    {
+      "step": 2,
+      "thought": "I have found the relevant clause [PC-2026-027 §9] which states that if the Player is injured during Franchise Activity, the Franchise pays the retainer in full for the season. Now I need to check if there are any amendments to contract PC-2026-027 that modify this clause.",
+      "action": "find_amendments",
+      "input": {
+        "contract_id": "PC-2026-027"
+      },
+      "observation": "No amendments modify PC-2026-027. Its own clauses are current.",
+      "server": "clause-search",
+      "redactions": [],
+      "usage": {
+        "inputTokens": 1562,
+        "outputTokens": 104
+      },
+      "modelMs": 1007,
+      "toolMs": 3
+    },
+    {
+      "step": 3,
+      "thought": "I have verified that section 9 of PC-2026-027 governs injury and medical, stating that if the player is injured during Franchise Activity, the Franchise pays the retainer in full for the season [PC-2026-027 §9]. I also checked for amendments and confirmed there are none modifying this contract.",
+      "action": "finish",
+      "input": {
+        "answer": "If the player is injured during Franchise Activity, the Franchise pays the retainer in full for the season [PC-2026-027 §9]."
+      },
+      "observation": "(done)",
+      "server": null,
+      "redactions": [],
+      "usage": {
+        "inputTokens": 1686,
+        "outputTokens": 123
+      },
+      "modelMs": 1488,
+      "toolMs": 0
+    }
+  ],
+  "llmCalls": 3,
+  "usage": {
+    "inputTokens": 4352,
+    "outputTokens": 330
+  },
+  "activeMs": 5678,
+  "wallMs": 14507,
+  "tools": [
+    "list_contracts",
+    "search_clauses",
+    "read_section",
+    "find_amendments",
+    "get_contract",
+    "get_effective_date",
+    "get_amendment_chain"
+  ],
+  "observedLabels": [
+    "PC-2026-027 §9",
+    "PC-2026-027 §4",
+    "PC-2026-027 §5"
+  ],
+  "defences": {
+    "sanitiseDocuments": false,
+    "validateCitations": false,
+    "requireAmendmentCheck": false
+  },
+  "redactions": [],
+  "gateRejections": []
+}

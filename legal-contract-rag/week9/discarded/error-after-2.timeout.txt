@@ -1,0 +1,38 @@
+
+Agent · gemini:gemini-3.5-flash-lite
+Question: In PC-2026-027, what happens to the player's retainer if he is injured during the season?
+
+Failed to obtain server version. Unable to check client-server compatibility. Set checkCompatibility=false to skip version check.
+MCP config mcp.config.json → 7 tools discovered via tools/list:
+  clause-search        list_contracts, search_clauses, read_section, find_amendments
+  contract-repository  get_contract, get_effective_date, get_amendment_chain
+
+Step 1
+  thought    I need to check the retainer or injury provisions in contract PC-2026-027. I will use search_clauses with the contract_id to find clauses about injury.
+  action     search_clauses {"contract_id":"PC-2026-027","query":"injury"}   [mcp: clause-search]
+  observed   The search index is unreachable (vector store: ECONNRESET). This is an outage on the search side, not a sign that PC-2026-027 lacks such a clause, and repeating this call — reworded or not — will not help.
+             Keyword-only matches (they share your words; a clause worded differently can be missed):
+             
+             [PC-2026-027 §9] 9. INJURY AND MEDICAL
+             
+             If the Player is injured during Franchise Activity, the
+             Franchise pays the retainer in full for the season. A
+             replacement player may be signed without further liability to
+             the Player.
+             
+             If none of these answers the question: read_section needs no index — PC-2026-02…
+  cost       1104 in / 80 out tokens · model 73997 ms · tool 1841 ms
+
+Step 2
+  thought    The search index was unreachable, but the keyword fallback successfully identified Section 9 (INJURY AND MEDICAL) of PC-2026-027. Before answering, I must check if there are any amendments modifying PC-2026-027.
+  action     find_amendments {"contract_id":"PC-2026-027"}   [mcp: clause-search]
+  observed   No amendments modify PC-2026-027. Its own clauses are current.
+  cost       1420 in / 91 out tokens · model 202301 ms · tool 74 ms
+
+Stopped: time-budget
+Answer: (none — the run stopped before finishing)
+
+2 model calls · 2695 tokens · 278.2s active · 445.3s wall
+
+saved → week9/error-after-2.json
+

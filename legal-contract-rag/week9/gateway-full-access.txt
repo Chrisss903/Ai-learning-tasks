@@ -1,0 +1,59 @@
+
+Agent · gemini:gemini-3.5-flash-lite
+Question: For Thursday's renewal review on 2026-10-15: what termination notice period applies under SA-2026-001 on that date, and since when has it applied?
+
+Failed to obtain server version. Unable to check client-server compatibility. Set checkCompatibility=false to skip version check.
+MCP config mcp.frontdoor.json → 7 tools discovered via tools/list:
+  gateway              list_contracts, search_clauses, read_section, find_amendments, get_contract, get_effective_date, get_amendment_chain
+
+Step 1
+  thought    I need to find the termination notice period for SA-2026-001 as of 2026-10-15 and the date it has applied since. I'll search for the termination clause in SA-2026-001 and check its amendment chain as of that date.
+  action     search_clauses {"contract_id":"SA-2026-001","query":"termination notice"}   [mcp: gateway]
+  observed   The search index is unreachable (vector store: ECONNRESET). This is an outage on the search side, not a sign that SA-2026-001 lacks such a clause, and repeating this call — reworded or not — will not help.
+             Keyword-only matches (they share your words; a clause worded differently can be missed):
+             
+             [SA-2026-001 §5] 5. TERMINATION
+             
+             Either party may terminate this agreement by providing
+             30 days written notice to the other party.
+             
+             If none of these answers the question: read_section needs no index — SA-2026-001's sections are: §1 PARTIES; §2 EFFECTIVE DATE; §3 CONTRACT TERM; §4 SERVICE DESCRIPTION; §5…
+  cost       1122 in / 109 out tokens · model 963 ms · tool 1675 ms
+
+Step 2
+  thought    I have found the original termination clause in SA-2026-001 §5, which states a 30-day notice period. Now I need to check the amendment chain for SA-2026-001 as of 2026-10-15 to see if this notice period was modified, and determine since when the current notice period has applied.
+  action     get_amendment_chain {"contract_id":"SA-2026-001","as_of":"2026-10-15"}   [mcp: gateway]
+  observed   Amendment chain for SA-2026-001 (effective 2026-08-01), oldest first, evaluated on 2026-10-15:
+             
+             1. AMD-2026-001 — effective 2026-10-01 — replaces §5 TERMINATION — IN FORCE on 2026-10-15
+             [AMD-2026-001 §1] 1. PURPOSE
+             
+             This amendment modifies specific provisions of the
+             Service Agreement SA-2026-001.
+             [AMD-2026-001 §2] 2. TERMINATION NOTICE
+             
+             Section 5 of the original Service Agreement is hereby
+             amended.
+             
+             The original termination notice period of 30 days is
+             replaced with a termination notice period of 60 days.
+             
+             The updated requirement is therefore:
+             
+             Either party must provide 60 days written notice
+             b…
+  cost       1427 in / 136 out tokens · model 1277 ms · tool 26 ms
+
+Step 3
+  thought    I have found the original termination clause in SA-2026-001 §5, and the amendment chain shows that AMD-2026-001 replaced the 30-day notice period with a 60-day notice period effective October 1, 2026. Therefore, on 2026-10-15, the applicable termination notice period is 60 days, and it has applied since October 1, 2026.
+  action     finish {"answer":"Under SA-2026-001, as amended by AMD-2026-001, the termination notice period on October 15, 2026, is 60 days [SA-2026-001 §5; AMD-2026-001 §2]. This 60-day notice period has applied since October 1, 2026 [AMD-2026-001 §3]."}
+  observed   (done)
+  cost       1905 in / 238 out tokens · model 1457 ms · tool 0 ms
+
+Stopped: finished
+Answer: Under SA-2026-001, as amended by AMD-2026-001, the termination notice period on October 15, 2026, is 60 days [SA-2026-001 §5; AMD-2026-001 §2]. This 60-day notice period has applied since October 1, 2026 [AMD-2026-001 §3].
+
+3 model calls · 4937 tokens · 5.4s active · 14.5s wall
+
+saved → week9/gateway-full-access.json
+

@@ -1,0 +1,71 @@
+{
+  "ranAt": "2026-10-13T15:11:31.480Z",
+  "generator": "gemini:gemini-3.5-flash-lite",
+  "mcpConfig": "mcp.config.json",
+  "question": "In PC-2026-027, what happens to the player's retainer if he is injured during the season?",
+  "answer": null,
+  "stopReason": "time-budget",
+  "steps": [
+    {
+      "step": 1,
+      "thought": "I need to check the retainer or injury provisions in contract PC-2026-027. I will use search_clauses with the contract_id to find clauses about injury.",
+      "action": "search_clauses",
+      "input": {
+        "contract_id": "PC-2026-027",
+        "query": "injury"
+      },
+      "observation": "The search index is unreachable (vector store: ECONNRESET). This is an outage on the search side, not a sign that PC-2026-027 lacks such a clause, and repeating this call — reworded or not — will not help.\nKeyword-only matches (they share your words; a clause worded differently can be missed):\n\n[PC-2026-027 §9] 9. INJURY AND MEDICAL\n\nIf the Player is injured during Franchise Activity, the\nFranchise pays the retainer in full for the season. A\nreplacement player may be signed without further liability to\nthe Player.\n\nIf none of these answers the question: read_section needs no index — PC-2026-027's sections are: §1 PARTIES; §2 DEFINITIONS; §3 CONTRACT TERM; §4 RETAINER FEE; §5 MATCH FEES; §6 PLAYER AVAILABILITY; §7 IMAGE RIGHTS; §8 TERMINATION; §9 INJURY AND MEDICAL; §10 CODE OF CONDUCT; §11 GOVERNING LAW AND DISPUTES.",
+      "server": "clause-search",
+      "redactions": [],
+      "usage": {
+        "inputTokens": 1104,
+        "outputTokens": 80
+      },
+      "modelMs": 73997,
+      "toolMs": 1841
+    },
+    {
+      "step": 2,
+      "thought": "The search index was unreachable, but the keyword fallback successfully identified Section 9 (INJURY AND MEDICAL) of PC-2026-027. Before answering, I must check if there are any amendments modifying PC-2026-027.",
+      "action": "find_amendments",
+      "input": {
+        "contract_id": "PC-2026-027"
+      },
+      "observation": "No amendments modify PC-2026-027. Its own clauses are current.",
+      "server": "clause-search",
+      "redactions": [],
+      "usage": {
+        "inputTokens": 1420,
+        "outputTokens": 91
+      },
+      "modelMs": 202301,
+      "toolMs": 74
+    }
+  ],
+  "llmCalls": 2,
+  "usage": {
+    "inputTokens": 2524,
+    "outputTokens": 171
+  },
+  "activeMs": 278213,
+  "wallMs": 445287,
+  "tools": [
+    "list_contracts",
+    "search_clauses",
+    "read_section",
+    "find_amendments",
+    "get_contract",
+    "get_effective_date",
+    "get_amendment_chain"
+  ],
+  "observedLabels": [
+    "PC-2026-027 §9"
+  ],
+  "defences": {
+    "sanitiseDocuments": false,
+    "validateCitations": false,
+    "requireAmendmentCheck": false
+  },
+  "redactions": [],
+  "gateRejections": []
+}
