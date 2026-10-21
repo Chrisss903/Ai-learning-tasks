@@ -1,0 +1,70 @@
+
+lean · gemini:gemini-3.5-flash-lite
+  cases 21 × 2 · priced at $0.5/M in, $3/M out
+  tools 7: clause-search/list_contracts, clause-search/search_clauses, clause-search/read_section, clause-search/find_amendments, contract-repository/get_contract, contract-repository/get_effective_date, contract-repository/get_amendment_chain
+
+  PASS  T01  lean       3 calls    3443 tok    4.3s  
+  PASS  T02  lean       3 calls    3540 tok    5.3s  
+  PASS  T03  lean       3 calls    3919 tok    5.2s  
+  PASS  T04  lean       4 calls    6237 tok    7.7s  
+  PASS  T05  lean       4 calls    4865 tok    6.6s  
+  PASS  T06  lean       4 calls    6696 tok    6.6s  
+  PASS  T07  lean       4 calls    6837 tok    6.8s  
+  PASS  T08  lean       3 calls    3782 tok    4.7s  
+  PASS  T09  lean       4 calls    6384 tok    6.8s  
+  FAIL  T10  lean       8 calls   15495 tok   17.8s  max-steps
+         ↳ no answer (max-steps)
+  FAIL  T11  lean       8 calls   14704 tok   17.7s  max-steps
+         ↳ no answer (max-steps)
+  PASS  T12  lean       5 calls    8876 tok   25.2s  
+  PASS  T13  lean       3 calls    4435 tok   17.1s  
+  PASS  T14  lean       3 calls    4361 tok   13.8s  
+  PASS  T15  lean       3 calls    4222 tok   12.3s  
+  PASS  T16  lean       4 calls    6282 tok   14.1s  
+  PASS  M01  lean       6 calls   11893 tok   12.0s  
+  PASS  M02  lean       6 calls   11791 tok   11.4s  
+  PASS  M03  lean       4 calls    7119 tok    7.4s  
+  FAIL  M04  lean       8 calls   16218 tok   16.9s  max-steps
+         ↳ no answer (max-steps)
+  PASS  M05  lean       6 calls   11843 tok   11.5s  
+  PASS  T01  lean       3 calls    3402 tok    4.7s  
+  PASS  T02  lean       3 calls    3477 tok    5.2s  
+  PASS  T03  lean       3 calls    4000 tok    5.8s  
+  PASS  T04  lean       4 calls    6167 tok   19.7s  
+  PASS  T05  lean       3 calls    3387 tok    4.8s  
+  PASS  T06  lean       4 calls    6968 tok    7.2s  
+  PASS  T07  lean       4 calls    6795 tok   11.1s  
+  PASS  T08  lean       3 calls    3923 tok    5.6s  
+  PASS  T09  lean       4 calls    6317 tok   12.3s  
+  FAIL  T10  lean       8 calls   14444 tok   16.5s  max-steps
+         ↳ no answer (max-steps)
+  FAIL  T11  lean       8 calls   15267 tok   19.9s  max-steps
+         ↳ no answer (max-steps)
+  PASS  T12  lean       4 calls    6655 tok    7.5s  
+  PASS  T13  lean       3 calls    4378 tok    6.6s  
+  PASS  T14  lean       3 calls    4342 tok   11.6s  
+  PASS  T15  lean       3 calls    4272 tok    6.5s  
+  PASS  T16  lean       4 calls    6191 tok    7.2s  
+  PASS  M01  lean       6 calls   11818 tok   12.8s  
+  PASS  M02  lean       6 calls   11725 tok   13.3s  
+  PASS  M03  lean       4 calls    7027 tok    8.7s  
+  PASS  M04  lean       6 calls   11764 tok   20.7s  
+  FAIL  M05  lean       7 calls   11936 tok   11.1s  
+         ↳ did-not-refuse: refused; states:2250000|22.5 lakh|2.25 million: missing "2250000|22.5 lakh|2.25 million"
+
+  all
+             passed       calls   tokens   $/question   mean time  p95 time   wall
+  lean       36/42 86%    4.5     7552     $0.00491     10.7s      19.9s      30.0s
+
+  single-clause
+             passed       calls   tokens   $/question   mean time  p95 time   wall
+  lean       28/32 88%    4.1     6377     $0.00411     10.1s      19.9s      27.2s
+
+  multi-step
+             passed       calls   tokens   $/question   mean time  p95 time   wall
+  lean       8/10 80%     5.9     11313    $0.00744     12.6s      20.7s      38.9s
+  lean stop reasons: finished 37, max-steps 5
+  same verdict on every attempt: lean 19/21
+
+  saved → evals/race-week10-lean.json
+

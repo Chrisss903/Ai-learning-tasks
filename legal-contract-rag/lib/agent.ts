@@ -23,6 +23,9 @@ import { discoverTools, type DiscoveredTool, type InputSchema } from "./mcp-clie
  * Week 9: the tools are no longer listed here. They are discovered over MCP
  * from the servers in mcp.config.json, and the prompt is built from whatever
  * tools/list returned — so a new server is a config change, not a code change.
+ *
+ * Week 10: the loop can work as someone else. A squad specialist is this same
+ * loop with a narrower brief and only the tools its job needs (lib/squad.ts).
  */
 export interface AgentLimits {
   /** Model turns, including the one that calls finish. */
@@ -128,17 +131,50 @@ function renderTool(tool: { name: string; description: string; inputSchema: Inpu
   return `- ${tool.name} ${shape}\n  ${tool.description.replace(/\n/g, "\n  ")}${notes}`;
 }
 
-const systemPrompt = (tools: DiscoveredTool[]) => `You are a research agent for the legal team of a cricket franchise. You answer questions about the contracts in a document store, working one step at a time with tools.
+/** Who the loop works as: the opening of its prompt, its rules, and its tools. */
+export interface AgentRole {
+  brief: string;
+  rules: string[];
+  /** Discovered tools this role may call, by name. Every one when absent. */
+  tools?: string[];
+}
+
+/** The week 7 agent. It is the default, so every earlier run is unchanged. */
+export const SINGLE_AGENT: AgentRole = {
+  brief:
+    "You are a research agent for the legal team of a cricket franchise. You answer questions about the contracts in a document store, working one step at a time with tools.",
+  rules: [
+    "Find the right contract id before searching; scope searches to it.",
+    "Before answering with a value from a contract, check that contract's amendments.",
+    "If a question involves two contracts, research each one.",
+    "Use only what the tools return. Do arithmetic yourself when asked.",
+    "Older tool results are trimmed from your memory, so write every fact you will need later into your thought.",
+  ],
+};
+
+/**
+ * Week 10 control. The squad beat the single agent on citation format and on
+ * tokens, and both look like prompt effects: its manager is told the bracket
+ * format right before it answers, and each specialist re-sends a 2–3 tool
+ * prompt where the single agent re-sends 7. This is the single agent with
+ * those two things and nothing else — week 8's four tools, one citation rule.
+ */
+export const LEAN_AGENT: AgentRole = {
+  ...SINGLE_AGENT,
+  rules: [
+    ...SINGLE_AGENT.rules,
+    'In your final answer, put every citation in square brackets — [PC-2026-011 §6] — never a bare "PC-2026-011 §6" or "(PC-2026-011 §6)".',
+  ],
+  tools: ["list_contracts", "search_clauses", "read_section", "find_amendments"],
+};
+
+const systemPrompt = (tools: DiscoveredTool[], role: AgentRole) => `${role.brief}
 
 Tools:
 ${[...tools, FINISH].map(renderTool).join("\n")}
 
 How to work:
-- Find the right contract id before searching; scope searches to it.
-- Before answering with a value from a contract, check that contract's amendments.
-- If a question involves two contracts, research each one.
-- Use only what the tools return. Do arithmetic yourself when asked.
-- Older tool results are trimmed from your memory, so write every fact you will need later into your thought.
+${role.rules.map((rule) => `- ${rule}`).join("\n")}
 
 Reply with exactly one JSON object and nothing else:
 {"thought": "what you know so far and what to do next", "action": "<tool name>", "input": { ... }}`;
@@ -234,15 +270,17 @@ export async function runAgent(
   options: {
     limits?: Partial<AgentLimits>;
     defences?: Partial<Defences>;
+    role?: AgentRole;
     onStep?: (step: AgentStep) => void;
   } = {},
 ): Promise<AgentRun> {
   const limits = { ...DEFAULT_LIMITS, ...options.limits };
   const defences = { ...NO_DEFENCES, ...options.defences };
+  const role = options.role ?? SINGLE_AGENT;
   const generator = resolveGenerator();
   const started = Date.now();
-  const tools = await discoverTools();
-  const prompt = systemPrompt(tools);
+  const tools = (await discoverTools()).filter((tool) => !role.tools || role.tools.includes(tool.name));
+  const prompt = systemPrompt(tools, role);
 
   const steps: AgentStep[] = [];
   const usage: Usage = { inputTokens: 0, outputTokens: 0 };

@@ -1,0 +1,126 @@
+
+> legal-contract-rag@0.1.0 race:squad
+> tsx scripts/race.mts --contenders agent,squad --label week10 --repeat 2
+
+
+agent vs squad · gemini:gemini-3.5-flash-lite
+  cases 21 × 2 · priced at $0.5/M in, $3/M out
+  tools 7: clause-search/list_contracts, clause-search/search_clauses, clause-search/read_section, clause-search/find_amendments, contract-repository/get_contract, contract-repository/get_effective_date, contract-repository/get_amendment_chain
+
+  PASS  T01  agent      3 calls    4176 tok    4.0s  
+  PASS  T01  squad      4 calls    3462 tok    6.6s  
+  PASS  T02  agent      3 calls    4271 tok    7.7s  
+  PASS  T02  squad      4 calls    3648 tok    6.2s  
+  PASS  T03  agent      3 calls    4713 tok    6.5s  
+  PASS  T03  squad      6 calls    5413 tok    9.6s  
+  FAIL  T04  agent      4 calls    7319 tok   11.5s  
+         ↳ no [ID §N] citation
+  PASS  T04  squad      6 calls    4976 tok    6.9s  
+  PASS  T05  agent      2 calls    2908 tok    2.6s  
+  PASS  T05  squad      4 calls    3498 tok    6.2s  
+  PASS  T06  agent      4 calls    7915 tok    7.8s  
+  PASS  T06  squad      6 calls    5571 tok    8.3s  
+  PASS  T07  agent      3 calls    5375 tok    3.5s  
+  PASS  T07  squad      6 calls    5354 tok    6.4s  
+  PASS  T08  agent      3 calls    4515 tok    5.1s  
+  PASS  T08  squad      6 calls    5206 tok   14.3s  
+  PASS  T09  agent      4 calls    7469 tok    5.9s  
+  PASS  T09  squad      6 calls    5212 tok    6.9s  
+  PASS  T10  agent      6 calls   12769 tok   12.2s  
+  PASS  T10  squad      6 calls    6775 tok   10.0s  
+  PASS  T11  agent      7 calls   14663 tok   18.2s  
+  FAIL  T11  squad      7 calls    8253 tok   13.6s  
+         ↳ refused-as-expected: answered anyway
+  PASS  T12  agent      4 calls    7580 tok    6.8s  
+  PASS  T12  squad      7 calls    6990 tok   10.0s  
+  PASS  T13  agent      4 calls    7377 tok    7.1s  
+  PASS  T13  squad      5 calls    5762 tok    8.2s  
+  PASS  T14  agent      3 calls    5144 tok    5.9s  
+  PASS  T14  squad      4 calls    3592 tok    6.6s  
+  PASS  T15  agent      3 calls    4995 tok    5.3s  
+  PASS  T15  squad      4 calls    3396 tok    6.1s  
+  FAIL  T16  agent      4 calls    7223 tok    7.0s  
+         ↳ no [ID §N] citation
+  PASS  T16  squad      4 calls    3634 tok    6.1s  
+  PASS  M01  agent      6 calls   13479 tok   11.2s  
+  PASS  M01  squad      8 calls    7520 tok    6.3s  
+  PASS  M02  agent      6 calls   13312 tok   12.5s  
+  PASS  M02  squad      8 calls    7679 tok    8.1s  
+  PASS  M03  agent      4 calls    8143 tok    9.9s  
+  PASS  M03  squad      6 calls    5788 tok    7.5s  
+  FAIL  M04  agent      5 calls   10604 tok   10.5s  
+         ↳ no [ID §N] citation
+  PASS  M04  squad      8 calls    7365 tok  154.8s  
+  PASS  M05  agent      3 calls    5592 tok    6.8s  
+  PASS  M05  squad      4 calls    3956 tok   29.7s  
+  PASS  T01  agent      3 calls    4154 tok    9.3s  
+  PASS  T01  squad      4 calls    3614 tok    7.0s  
+  PASS  T02  agent      3 calls    4229 tok    5.6s  
+  PASS  T02  squad      6 calls    4835 tok   10.8s  
+  FAIL  T03  agent      3 calls    4618 tok   15.8s  
+         ↳ no [ID §N] citation
+  PASS  T03  squad      6 calls    5281 tok    8.4s  
+  FAIL  T04  agent      4 calls    7213 tok   19.8s  
+         ↳ no [ID §N] citation
+  PASS  T04  squad      4 calls    3591 tok   24.6s  
+  PASS  T05  agent      2 calls    2912 tok    9.9s  
+  PASS  T05  squad      4 calls    3516 tok   11.0s  
+  PASS  T06  agent      4 calls    7869 tok   14.9s  
+  PASS  T06  squad      6 calls    5564 tok   11.3s  
+  PASS  T07  agent      4 calls    7916 tok    7.7s  
+  PASS  T07  squad      6 calls    5422 tok   14.8s  
+  PASS  T08  agent      3 calls    4494 tok    9.4s  
+  PASS  T08  squad      6 calls    5210 tok   10.5s  
+  PASS  T09  agent      4 calls    7424 tok   15.0s  
+  PASS  T09  squad      6 calls    5191 tok    7.5s  
+  PASS  T10  agent      7 calls   15227 tok   22.2s  
+  PASS  T10  squad      7 calls    8889 tok   13.7s  
+  FAIL  T11  agent      7 calls   14406 tok   14.4s  
+         ↳ refused-as-expected: answered anyway
+  PASS  T11  squad      6 calls    6474 tok   13.9s  
+  FAIL  T12  agent      4 calls    7959 tok    7.1s  
+         ↳ refused-as-expected: answered anyway
+  PASS  T12  squad      7 calls    6791 tok  265.0s  
+  PASS  T13  agent      3 calls    5182 tok    6.1s  
+  PASS  T13  squad      5 calls    5658 tok    7.5s  
+  PASS  T14  agent      3 calls    5127 tok    5.2s  
+  PASS  T14  squad      4 calls    3631 tok    5.7s  
+  PASS  T15  agent      3 calls    4948 tok    5.2s  
+  PASS  T15  squad      4 calls    3430 tok    6.8s  
+  PASS  T16  agent      4 calls    7225 tok    7.3s  
+  PASS  T16  squad      4 calls    3601 tok    5.8s  
+  PASS  M01  agent      6 calls   13017 tok   10.5s  
+  PASS  M01  squad      8 calls    7420 tok    6.5s  
+  PASS  M02  agent      6 calls   13343 tok   10.7s  
+  PASS  M02  squad      8 calls    7753 tok   17.5s  
+  PASS  M03  agent      4 calls    7993 tok   17.3s  
+  PASS  M03  squad      6 calls    5917 tok   13.2s  
+  PASS  M04  agent      5 calls   10720 tok   11.0s  
+  PASS  M04  squad      8 calls    7389 tok   25.6s  
+  PASS  M05  agent      3 calls    5522 tok    4.5s  
+  PASS  M05  squad      4 calls    3678 tok    7.2s  
+
+  all
+             passed       calls   tokens   $/question   mean time  p95 time   wall
+  agent      35/42 83%    4.0     7644     $0.00489     9.5s       18.2s      27.1s
+  squad      41/42 98%    5.7     5379     $0.00416     19.8s      29.7s      46.0s
+
+  single-clause
+             passed       calls   tokens   $/question   mean time  p95 time   wall
+  agent      26/32 81%    3.8     6854     $0.00434     9.1s       19.8s      25.1s
+  squad      31/32 97%    5.3     5045     $0.00381     17.4s      24.6s      41.6s
+
+  multi-step
+             passed       calls   tokens   $/question   mean time  p95 time   wall
+  agent      9/10 90%     4.8     10173    $0.00664     10.5s      17.3s      33.5s
+  squad      10/10 100%   6.8     6447     $0.00528     27.6s      154.8s     60.0s
+
+  squad per question, by member: manager 2.0 calls / 1715 tok · clause-researcher 2.6 calls / 2865 tok · amendment-checker 1.0 calls / 800 tok
+  agent stop reasons: finished 42
+  squad stop reasons: finished 42
+
+  cases where agent and squad differ: T03 (agent 50%, squad 100%), T04 (agent 0%, squad 100%), T12 (agent 50%, squad 100%), T16 (agent 50%, squad 100%), M04 (agent 50%, squad 100%)
+  same verdict on every attempt: agent 16/21, squad 20/21
+
+  saved → evals/race-week10.json
+

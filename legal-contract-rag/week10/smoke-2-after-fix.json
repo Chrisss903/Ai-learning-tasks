@@ -1,0 +1,1011 @@
+{
+  "label": "smoke",
+  "ranAt": "2026-10-21T06:04:05.084Z",
+  "generator": "gemini:gemini-3.5-flash-lite",
+  "pricing": {
+    "inputPerMillion": 0.5,
+    "outputPerMillion": 3
+  },
+  "contenders": [
+    "agent",
+    "squad"
+  ],
+  "repeat": 1,
+  "tools": [
+    "clause-search/list_contracts",
+    "clause-search/search_clauses",
+    "clause-search/read_section",
+    "clause-search/find_amendments",
+    "contract-repository/get_contract",
+    "contract-repository/get_effective_date",
+    "contract-repository/get_amendment_chain"
+  ],
+  "cards": [
+    {
+      "protocolVersion": "0.3.0",
+      "name": "clause-researcher",
+      "description": "Finds the clause in one contract that answers a question and reports it as executed, with its [CONTRACT-ID §N] label. Does not check amendments.",
+      "url": "http://localhost:41241/clause-researcher",
+      "version": "1.0.0",
+      "capabilities": {
+        "streaming": false,
+        "pushNotifications": false
+      },
+      "defaultInputModes": [
+        "text/plain"
+      ],
+      "defaultOutputModes": [
+        "text/plain"
+      ],
+      "skills": [
+        {
+          "id": "find-clause",
+          "name": "Find a clause",
+          "description": "Given a contract id and a topic, returns the clause that covers it and the exact value it states, or says the contract has no such clause. Given no id, first finds the document that covers the topic.",
+          "tags": [
+            "contracts",
+            "clauses",
+            "search"
+          ],
+          "examples": [
+            "Contract PC-2026-027: what is the termination notice period?",
+            "Which document caps overseas players in the playing eleven, and at how many?"
+          ]
+        }
+      ]
+    },
+    {
+      "protocolVersion": "0.3.0",
+      "name": "amendment-checker",
+      "description": "Reports what the amendments to one contract changed: the sections they replace, the old and new values, and the [AMENDMENT-ID §N] label of each change. Does not search the contract itself.",
+      "url": "http://localhost:41241/amendment-checker",
+      "version": "1.0.0",
+      "capabilities": {
+        "streaming": false,
+        "pushNotifications": false
+      },
+      "defaultInputModes": [
+        "text/plain"
+      ],
+      "defaultOutputModes": [
+        "text/plain"
+      ],
+      "skills": [
+        {
+          "id": "check-amendments",
+          "name": "Check amendments",
+          "description": "Given a contract id and a topic, returns every amendment that changes that topic, with the replacing value, or says that no amendment changes it.",
+          "tags": [
+            "contracts",
+            "amendments"
+          ],
+          "examples": [
+            "Contract PC-2026-011: has the termination notice period been amended, and to what?"
+          ]
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "all": {
+      "agent": {
+        "runs": 2,
+        "errors": 0,
+        "passed": 2,
+        "passRate": 1,
+        "finishedRate": 1,
+        "meanCalls": 5,
+        "meanInputTokens": 9870.5,
+        "meanOutputTokens": 495.5,
+        "meanTokens": 10366,
+        "meanCost": 0.00642175,
+        "meanActiveMs": 9601,
+        "p95ActiveMs": 11825,
+        "meanBusyMs": 9601,
+        "meanWallMs": 30124,
+        "meanByRole": null
+      },
+      "squad": {
+        "runs": 2,
+        "errors": 0,
+        "passed": 2,
+        "passRate": 1,
+        "finishedRate": 1,
+        "meanCalls": 7,
+        "meanInputTokens": 5549,
+        "meanOutputTokens": 738.5,
+        "meanTokens": 6287.5,
+        "meanCost": 0.00499,
+        "meanActiveMs": 8341,
+        "p95ActiveMs": 9667,
+        "meanBusyMs": 13125,
+        "meanWallMs": 45126,
+        "meanByRole": {
+          "manager": {
+            "calls": 2,
+            "tokens": 1849
+          },
+          "clause-researcher": {
+            "calls": 3,
+            "tokens": 2915
+          },
+          "amendment-checker": {
+            "calls": 2,
+            "tokens": 1523.5
+          }
+        }
+      }
+    },
+    "single-clause": {
+      "agent": {
+        "runs": 1,
+        "errors": 0,
+        "passed": 1,
+        "passRate": 1,
+        "finishedRate": 1,
+        "meanCalls": 4,
+        "meanInputTokens": 7052,
+        "meanOutputTokens": 346,
+        "meanTokens": 7398,
+        "meanCost": 0.004564,
+        "meanActiveMs": 7377,
+        "p95ActiveMs": 7377,
+        "meanBusyMs": 7377,
+        "meanWallMs": 21111,
+        "meanByRole": null
+      },
+      "squad": {
+        "runs": 1,
+        "errors": 0,
+        "passed": 1,
+        "passRate": 1,
+        "finishedRate": 1,
+        "meanCalls": 6,
+        "meanInputTokens": 4548,
+        "meanOutputTokens": 593,
+        "meanTokens": 5141,
+        "meanCost": 0.004053,
+        "meanActiveMs": 9667,
+        "p95ActiveMs": 9667,
+        "meanBusyMs": 11927,
+        "meanWallMs": 38623,
+        "meanByRole": {
+          "manager": {
+            "calls": 2,
+            "tokens": 1762
+          },
+          "clause-researcher": {
+            "calls": 2,
+            "tokens": 1919
+          },
+          "amendment-checker": {
+            "calls": 2,
+            "tokens": 1460
+          }
+        }
+      }
+    },
+    "multi-step": {
+      "agent": {
+        "runs": 1,
+        "errors": 0,
+        "passed": 1,
+        "passRate": 1,
+        "finishedRate": 1,
+        "meanCalls": 6,
+        "meanInputTokens": 12689,
+        "meanOutputTokens": 645,
+        "meanTokens": 13334,
+        "meanCost": 0.0082795,
+        "meanActiveMs": 11825,
+        "p95ActiveMs": 11825,
+        "meanBusyMs": 11825,
+        "meanWallMs": 39137,
+        "meanByRole": null
+      },
+      "squad": {
+        "runs": 1,
+        "errors": 0,
+        "passed": 1,
+        "passRate": 1,
+        "finishedRate": 1,
+        "meanCalls": 8,
+        "meanInputTokens": 6550,
+        "meanOutputTokens": 884,
+        "meanTokens": 7434,
+        "meanCost": 0.005927,
+        "meanActiveMs": 7015,
+        "p95ActiveMs": 7015,
+        "meanBusyMs": 14323,
+        "meanWallMs": 51629,
+        "meanByRole": {
+          "manager": {
+            "calls": 2,
+            "tokens": 1936
+          },
+          "clause-researcher": {
+            "calls": 4,
+            "tokens": 3911
+          },
+          "amendment-checker": {
+            "calls": 2,
+            "tokens": 1587
+          }
+        }
+      }
+    }
+  },
+  "consistency": null,
+  "results": [
+    {
+      "caseId": "T09",
+      "type": "superseded-value",
+      "group": "single-clause",
+      "contender": "agent",
+      "attempt": 1,
+      "answer": "To terminate the AlphaTech service agreement (SA-2026-001 §5), 60 days written notice is required, as amended by [AMD-2026-001 §2].",
+      "passed": true,
+      "failures": [],
+      "stopReason": "finished",
+      "llmCalls": 4,
+      "inputTokens": 7052,
+      "outputTokens": 346,
+      "cost": 0.004564,
+      "activeMs": 7377,
+      "busyMs": 7377,
+      "wallMs": 21111,
+      "byRole": null,
+      "steps": [
+        {
+          "step": 1,
+          "thought": "I need to find the AlphaTech service agreement to know its contract ID so I can look up its termination notice period and any amendments.",
+          "action": "list_contracts",
+          "input": {},
+          "observation": "AMD-PC-011-01 (amendment) — AMENDMENT NUMBER ONE TO PLAYER CONTRACT\n  This Amendment Number One modifies the Player Registration and Services Contract PC-2026-011.\nADP-2026 — ANTI-DOPING POLICY\n  This policy applies to every player registered with the Premier Cricket League and is based on the World Anti-Doping Code.\nBRD-2026-002 — MEDIA AND BROADCAST RIGHTS AGREEMENT\n  The Premier Cricket League grants Meridian Sports Network the right to broadcast all League matches for the seasons covered by this agreement.\nCOC-2026 — PLAYER CODE OF CONDUCT\n  This Code of Conduct applies to every registered player, coach, and support staff member of a Premier Cricket League franchise.\nAMD-2026-001 (amendment) — SAMPLE CONTRACT AMENDMENT\n  This amendment modifies specific provisions of the Service Agreement SA-2026-001.\nFA-2025-003 — FRANCHISE PARTICIPATION AGREEMENT\n  The Premier Cricket League grants Chennai Chargers Cricket Club the right to operate a franchise team in the League for the term set out in Section 2.\nPT-2026-001 — SAMPLE PAYMENT AND SERVICE TERMS\n  BetaWorks Pvt. Ltd. must pay all invoices issued by AlphaTech Solutions within 30 days from the invoice date.\nPC-2026-027 — PLAYER REGISTRATION AND SERVICES CONTRACT\n  This contract is entered into between Chennai Chargers Cricket Club (the \"Franchise\") and Dinesh Mendis (the \"Player\"), an overseas fast bowler registered with the Premier Cricket League.\nPC-2026-011 — PLAYER REGISTRATION AND SERVICES CONTRACT\n  This contract is entered into between Chennai Chargers Cricket Club (the \"Franchise\") and Rohan Sharma (the \"Player\"), a domestic batting all-rounder registered with the Premier Cricket League.\nTRF-2026-008 — MID SEASON PLAYER TRANSFER AGREEMENT\n  This agreement records the transfer of Arjun Kale, a wicket keeper batter, from Deccan Falcons Cricket Club to Chennai Chargers Cricket Club.\nSA-2026-001 — SAMPLE SERVICE AGREEMENT\n  This Service Agreement is entered into between AlphaTech Solutions and BetaWorks Pvt. Ltd.\nSPN-2026-014 — TITLE SPONSORSHIP AGREEMENT\n  This sponsorship agreement is entered into between Chennai Chargers Cricket Club and VoltEnergy Beverages Private Limited (the \"Sponsor\").\nVEN-2026-005 — STADIUM HIRE AND MATCH DAY AGREEMENT\n  This agreement is entered into between the Tamil Nadu Cricket Stadium Trust (the \"Venue\") and Chennai Chargers Cricket Club for the staging of home matches.",
+          "server": "clause-search",
+          "redactions": [],
+          "usage": {
+            "inputTokens": 1090,
+            "outputTokens": 44
+          },
+          "modelMs": 1261,
+          "toolMs": 10
+        },
+        {
+          "step": 2,
+          "thought": "I have found the AlphaTech service agreement ID: SA-2026-001. Now I need to find the termination notice period for this contract using search_clauses or read_section, and also check for amendments.",
+          "action": "search_clauses",
+          "input": {
+            "contract_id": "SA-2026-001",
+            "query": "termination notice"
+          },
+          "observation": "[SA-2026-001 §5] 5. TERMINATION\n\nEither party may terminate this agreement by providing\n30 days written notice to the other party.\n\n[SA-2026-001 §9] 9. GENERAL TERMS\n\nAny changes to this agreement must be made through a\nwritten amendment approved by both parties.\n\n[SA-2026-001 §3] 3. CONTRACT TERM\n\nThe agreement will remain valid for a period of three years\nfrom the effective date.",
+          "server": "clause-search",
+          "redactions": [],
+          "usage": {
+            "inputTokens": 1732,
+            "outputTokens": 89
+          },
+          "modelMs": 1369,
+          "toolMs": 814
+        },
+        {
+          "step": 3,
+          "thought": "I found Section 5 of SA-2026-001, which states that either party may terminate the agreement by providing 30 days written notice. Now I need to check if there are any amendments modifying this clause using find_amendments.",
+          "action": "find_amendments",
+          "input": {
+            "contract_id": "SA-2026-001"
+          },
+          "observation": "1 amendment(s) modify SA-2026-001:\n\n[AMD-2026-001 §1] 1. PURPOSE\n\nThis amendment modifies specific provisions of the\nService Agreement SA-2026-001.\n\n[AMD-2026-001 §2] 2. TERMINATION NOTICE\n\nSection 5 of the original Service Agreement is hereby\namended.\n\nThe original termination notice period of 30 days is\nreplaced with a termination notice period of 60 days.\n\nThe updated requirement is therefore:\n\nEither party must provide 60 days written notice\nbefore terminating the agreement.\n\n[AMD-2026-001 §3] 3. EFFECTIVE DATE OF AMENDMENT\n\nThis amendment becomes effective on October 1, 2026.\n\n[AMD-2026-001 §4] 4. OTHER TERMS\n\nAll other provisions of the original Service Agreement\nremain unchanged and continue to remain in effect.\n\n[AMD-2026-001 §5] 5. PRIORITY\n\nIf there is a conflict between this amendment and the\noriginal Service Agreement regarding the termination\nnotice period, this amendment shall take precedence.",
+          "server": "clause-search",
+          "redactions": [],
+          "usage": {
+            "inputTokens": 1935,
+            "outputTokens": 89
+          },
+          "modelMs": 2311,
+          "toolMs": 2
+        },
+        {
+          "step": 4,
+          "thought": "I have found that the original termination notice period in SA-2026-001 §5 was 30 days, but amendment AMD-2026-001 §2 replaced it with 60 days written notice. I am now ready to finish.",
+          "action": "finish",
+          "input": {
+            "answer": "To terminate the AlphaTech service agreement (SA-2026-001 §5), 60 days written notice is required, as amended by [AMD-2026-001 §2]."
+          },
+          "observation": "(done)",
+          "server": null,
+          "redactions": [],
+          "usage": {
+            "inputTokens": 2295,
+            "outputTokens": 124
+          },
+          "modelMs": 1610,
+          "toolMs": 0
+        }
+      ],
+      "squad": null
+    },
+    {
+      "caseId": "T09",
+      "type": "superseded-value",
+      "group": "single-clause",
+      "contender": "squad",
+      "attempt": 1,
+      "answer": "60 days written notice [AMD-2026-001 §2].",
+      "passed": true,
+      "failures": [],
+      "stopReason": "finished",
+      "llmCalls": 6,
+      "inputTokens": 4548,
+      "outputTokens": 593,
+      "cost": 0.004053,
+      "activeMs": 9667,
+      "busyMs": 11927,
+      "wallMs": 38623,
+      "byRole": {
+        "manager": {
+          "calls": 2,
+          "inputTokens": 1535,
+          "outputTokens": 227
+        },
+        "clause-researcher": {
+          "calls": 2,
+          "inputTokens": 1751,
+          "outputTokens": 168
+        },
+        "amendment-checker": {
+          "calls": 2,
+          "inputTokens": 1262,
+          "outputTokens": 198
+        }
+      },
+      "steps": [],
+      "squad": {
+        "thought": "The user is asking about the written notice required to terminate the AlphaTech service agreement. According to the contract catalog, the AlphaTech service agreement is SA-2026-001. There is also an amendment associated with it, AMD-2026-001. Therefore, I need the clause-researcher to find the termination notice period in contract SA-2026-001, and the amendment-checker to check if and how that topic has been amended by AMD-2026-001.",
+        "manager": [
+          {
+            "name": "plan",
+            "text": "```json\n{\"thought\": \"The user is asking about the written notice required to terminate the AlphaTech service agreement. According to the contract catalog, the AlphaTech service agreement is SA-2026-001. There is also an amendment associated with it, AMD-2026-001. Therefore, I need the clause-researcher to find the termination notice period in contract SA-2026-001, and the amendment-checker to check if and how that topic has been amended by AMD-2026-001.\", \"tasks\": [{\"to\": \"clause-researcher\", \"contract_id\": \"SA-2026-001\", \"task\": \"What is the termination notice period?\"}, {\"to\": \"amendment-checker\", \"contract_id\": \"SA-2026-001\", \"task\": \"Has the termination notice period been amended, and to what?\"}]}\n```",
+            "usage": {
+              "inputTokens": 1083,
+              "outputTokens": 208
+            },
+            "ms": 3745
+          },
+          {
+            "name": "answer",
+            "text": "60 days written notice [AMD-2026-001 §2].",
+            "usage": {
+              "inputTokens": 452,
+              "outputTokens": 19
+            },
+            "ms": 1091
+          }
+        ],
+        "tasks": [
+          {
+            "to": "clause-researcher",
+            "contractId": "SA-2026-001",
+            "task": "What is the termination notice period?",
+            "id": "t1",
+            "states": [
+              {
+                "state": "submitted",
+                "at": "2026-10-21T06:02:03.992Z"
+              },
+              {
+                "state": "working",
+                "at": "2026-10-21T06:02:03.992Z"
+              },
+              {
+                "state": "completed",
+                "at": "2026-10-21T06:02:20.849Z"
+              }
+            ],
+            "report": "The termination notice period for contract SA-2026-001 is 30 days written notice [SA-2026-001 §5].",
+            "run": {
+              "question": "Contract SA-2026-001: What is the termination notice period?",
+              "answer": "The termination notice period for contract SA-2026-001 is 30 days written notice [SA-2026-001 §5].",
+              "stopReason": "finished",
+              "steps": [
+                {
+                  "step": 1,
+                  "thought": "I need to find the termination notice period in contract SA-2026-001. I will search for clauses related to termination notice within that specific contract.",
+                  "action": "search_clauses",
+                  "input": {
+                    "query": "termination notice",
+                    "contract_id": "SA-2026-001"
+                  },
+                  "observation": "[SA-2026-001 §5] 5. TERMINATION\n\nEither party may terminate this agreement by providing\n30 days written notice to the other party.\n\n[SA-2026-001 §9] 9. GENERAL TERMS\n\nAny changes to this agreement must be made through a\nwritten amendment approved by both parties.\n\n[SA-2026-001 §3] 3. CONTRACT TERM\n\nThe agreement will remain valid for a period of three years\nfrom the effective date.",
+                  "server": "clause-search",
+                  "redactions": [],
+                  "usage": {
+                    "inputTokens": 781,
+                    "outputTokens": 76
+                  },
+                  "modelMs": 2080,
+                  "toolMs": 1651
+                },
+                {
+                  "step": 2,
+                  "thought": "I have found the termination clause in contract SA-2026-001, which states that either party may terminate the agreement by providing 30 days written notice.",
+                  "action": "finish",
+                  "input": {
+                    "answer": "The termination notice period for contract SA-2026-001 is 30 days written notice [SA-2026-001 §5]."
+                  },
+                  "observation": "(done)",
+                  "server": null,
+                  "redactions": [],
+                  "usage": {
+                    "inputTokens": 970,
+                    "outputTokens": 92
+                  },
+                  "modelMs": 1100,
+                  "toolMs": 0
+                }
+              ],
+              "llmCalls": 2,
+              "usage": {
+                "inputTokens": 1751,
+                "outputTokens": 168
+              },
+              "activeMs": 4831,
+              "wallMs": 16857,
+              "tools": [
+                "list_contracts",
+                "search_clauses",
+                "read_section"
+              ],
+              "observedLabels": [
+                "SA-2026-001 §5",
+                "SA-2026-001 §9",
+                "SA-2026-001 §3"
+              ],
+              "defences": {
+                "sanitiseDocuments": false,
+                "validateCitations": false,
+                "requireAmendmentCheck": false
+              },
+              "redactions": [],
+              "gateRejections": []
+            }
+          },
+          {
+            "to": "amendment-checker",
+            "contractId": "SA-2026-001",
+            "task": "Has the termination notice period been amended, and to what?",
+            "id": "t2",
+            "states": [
+              {
+                "state": "submitted",
+                "at": "2026-10-21T06:02:03.992Z"
+              },
+              {
+                "state": "working",
+                "at": "2026-10-21T06:02:03.992Z"
+              },
+              {
+                "state": "completed",
+                "at": "2026-10-21T06:02:27.295Z"
+              }
+            ],
+            "report": "Yes, the termination notice period has been amended. Amendment AMD-2026-001 §2 replaced the original 30-day notice period with a termination notice period of 60 days [AMD-2026-001 §2].",
+            "run": {
+              "question": "Contract SA-2026-001: Has the termination notice period been amended, and to what?",
+              "answer": "Yes, the termination notice period has been amended. Amendment AMD-2026-001 §2 replaced the original 30-day notice period with a termination notice period of 60 days [AMD-2026-001 §2].",
+              "stopReason": "finished",
+              "steps": [
+                {
+                  "step": 1,
+                  "thought": "I need to find all amendments for contract SA-2026-001 to check if the termination notice period has been modified.",
+                  "action": "find_amendments",
+                  "input": {
+                    "contract_id": "SA-2026-001"
+                  },
+                  "observation": "1 amendment(s) modify SA-2026-001:\n\n[AMD-2026-001 §1] 1. PURPOSE\n\nThis amendment modifies specific provisions of the\nService Agreement SA-2026-001.\n\n[AMD-2026-001 §2] 2. TERMINATION NOTICE\n\nSection 5 of the original Service Agreement is hereby\namended.\n\nThe original termination notice period of 30 days is\nreplaced with a termination notice period of 60 days.\n\nThe updated requirement is therefore:\n\nEither party must provide 60 days written notice\nbefore terminating the agreement.\n\n[AMD-2026-001 §3] 3. EFFECTIVE DATE OF AMENDMENT\n\nThis amendment becomes effective on October 1, 2026.\n\n[AMD-2026-001 §4] 4. OTHER TERMS\n\nAll other provisions of the original Service Agreement\nremain unchanged and continue to remain in effect.\n\n[AMD-2026-001 §5] 5. PRIORITY\n\nIf there is a conflict between this amendment and the\noriginal Service Agreement regarding the termination\nnotice period, this amendment shall take precedence.",
+                  "server": "clause-search",
+                  "redactions": [],
+                  "usage": {
+                    "inputTokens": 464,
+                    "outputTokens": 63
+                  },
+                  "modelMs": 1184,
+                  "toolMs": 28
+                },
+                {
+                  "step": 2,
+                  "thought": "I have found the amendment modifying the termination notice period for contract SA-2026-001. AMD-2026-001 §2 replaces the original 30-day notice period with a 60-day notice period.",
+                  "action": "finish",
+                  "input": {
+                    "answer": "Yes, the termination notice period has been amended. Amendment AMD-2026-001 §2 replaced the original 30-day notice period with a termination notice period of 60 days [AMD-2026-001 §2]."
+                  },
+                  "observation": "(done)",
+                  "server": null,
+                  "redactions": [],
+                  "usage": {
+                    "inputTokens": 798,
+                    "outputTokens": 135
+                  },
+                  "modelMs": 1048,
+                  "toolMs": 0
+                }
+              ],
+              "llmCalls": 2,
+              "usage": {
+                "inputTokens": 1262,
+                "outputTokens": 198
+              },
+              "activeMs": 2260,
+              "wallMs": 23303,
+              "tools": [
+                "find_amendments",
+                "get_amendment_chain"
+              ],
+              "observedLabels": [
+                "AMD-2026-001 §1",
+                "AMD-2026-001 §2",
+                "AMD-2026-001 §3",
+                "AMD-2026-001 §4",
+                "AMD-2026-001 §5"
+              ],
+              "defences": {
+                "sanitiseDocuments": false,
+                "validateCitations": false,
+                "requireAmendmentCheck": false
+              },
+              "redactions": [],
+              "gateRejections": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "caseId": "M01",
+      "type": "multi-step",
+      "group": "multi-step",
+      "contender": "agent",
+      "attempt": 1,
+      "answer": "Rohan Sharma has the longer termination notice period today. Rohan Sharma's termination notice period is 90 days (set by [PC-2026-011 §8] and amended by [AMD-PC-011-01 §3]), whereas Dinesh Mendis's termination notice period is 30 days ([PC-2026-027 §8]).",
+      "passed": true,
+      "failures": [],
+      "stopReason": "finished",
+      "llmCalls": 6,
+      "inputTokens": 12689,
+      "outputTokens": 645,
+      "cost": 0.0082795,
+      "activeMs": 11825,
+      "busyMs": 11825,
+      "wallMs": 39137,
+      "byRole": null,
+      "steps": [
+        {
+          "step": 1,
+          "thought": "We need to find the termination notice periods for Rohan Sharma and Dinesh Mendis. First, let's list all the contracts to identify their contract IDs.",
+          "action": "list_contracts",
+          "input": {},
+          "observation": "AMD-PC-011-01 (amendment) — AMENDMENT NUMBER ONE TO PLAYER CONTRACT\n  This Amendment Number One modifies the Player Registration and Services Contract PC-2026-011.\nADP-2026 — ANTI-DOPING POLICY\n  This policy applies to every player registered with the Premier Cricket League and is based on the World Anti-Doping Code.\nBRD-2026-002 — MEDIA AND BROADCAST RIGHTS AGREEMENT\n  The Premier Cricket League grants Meridian Sports Network the right to broadcast all League matches for the seasons covered by this agreement.\nCOC-2026 — PLAYER CODE OF CONDUCT\n  This Code of Conduct applies to every registered player, coach, and support staff member of a Premier Cricket League franchise.\nAMD-2026-001 (amendment) — SAMPLE CONTRACT AMENDMENT\n  This amendment modifies specific provisions of the Service Agreement SA-2026-001.\nFA-2025-003 — FRANCHISE PARTICIPATION AGREEMENT\n  The Premier Cricket League grants Chennai Chargers Cricket Club the right to operate a franchise team in the League for the term set out in Section 2.\nPT-2026-001 — SAMPLE PAYMENT AND SERVICE TERMS\n  BetaWorks Pvt. Ltd. must pay all invoices issued by AlphaTech Solutions within 30 days from the invoice date.\nPC-2026-027 — PLAYER REGISTRATION AND SERVICES CONTRACT\n  This contract is entered into between Chennai Chargers Cricket Club (the \"Franchise\") and Dinesh Mendis (the \"Player\"), an overseas fast bowler registered with the Premier Cricket League.\nPC-2026-011 — PLAYER REGISTRATION AND SERVICES CONTRACT\n  This contract is entered into between Chennai Chargers Cricket Club (the \"Franchise\") and Rohan Sharma (the \"Player\"), a domestic batting all-rounder registered with the Premier Cricket League.\nTRF-2026-008 — MID SEASON PLAYER TRANSFER AGREEMENT\n  This agreement records the transfer of Arjun Kale, a wicket keeper batter, from Deccan Falcons Cricket Club to Chennai Chargers Cricket Club.\nSA-2026-001 — SAMPLE SERVICE AGREEMENT\n  This Service Agreement is entered into between AlphaTech Solutions and BetaWorks Pvt. Ltd.\nSPN-2026-014 — TITLE SPONSORSHIP AGREEMENT\n  This sponsorship agreement is entered into between Chennai Chargers Cricket Club and VoltEnergy Beverages Private Limited (the \"Sponsor\").\nVEN-2026-005 — STADIUM HIRE AND MATCH DAY AGREEMENT\n  This agreement is entered into between the Tamil Nadu Cricket Stadium Trust (the \"Venue\") and Chennai Chargers Cricket Club for the staging of home matches.",
+          "server": "clause-search",
+          "redactions": [],
+          "usage": {
+            "inputTokens": 1101,
+            "outputTokens": 48
+          },
+          "modelMs": 1055,
+          "toolMs": 24
+        },
+        {
+          "step": 2,
+          "thought": "We have identified the contract IDs for Rohan Sharma (PC-2026-011) and Dinesh Mendis (PC-2026-027). Now let's search for the termination notice period for Rohan Sharma in contract PC-2026-011.",
+          "action": "search_clauses",
+          "input": {
+            "query": "termination notice period",
+            "contract_id": "PC-2026-011"
+          },
+          "observation": "[PC-2026-011 §8] 8. TERMINATION\n\nEither party may terminate this contract by giving 60 days\nwritten notice. The Franchise may terminate immediately for a\nLevel 4 offence under the Code of Conduct.\n\n[PC-2026-011 §2] 2. DEFINITIONS\n\n\"Season\" means the period from the first league match to the\nfinal, including play-offs. \"Match Fee\" means the amount payable\nfor each match in which the Player is named in the playing\neleven. \"Franchise Activity\" means training, travel, media, and\nsponsor appearances required by the Franchise.\n\n[PC-2026-011 §9] 9. INJURY AND MEDICAL\n\nIf the Player is injured during Franchise Activity, the\nFranchise pays the full retainer for that season and covers\nmedical treatment. An injury sustained outside Franchise\nActivity reduces the retainer by 50 percent for the period the\nPlayer is unavailable.",
+          "server": "clause-search",
+          "redactions": [],
+          "usage": {
+            "inputTokens": 1747,
+            "outputTokens": 104
+          },
+          "modelMs": 1190,
+          "toolMs": 2329
+        },
+        {
+          "step": 3,
+          "thought": "We found Rohan Sharma's termination notice period in PC-2026-011 §8 is 60 days. Now let's check if there are any amendments to PC-2026-011 that modify this termination period.",
+          "action": "find_amendments",
+          "input": {
+            "contract_id": "PC-2026-011"
+          },
+          "observation": "1 amendment(s) modify PC-2026-011:\n\n[AMD-PC-011-01 §1] 1. PURPOSE\n\nThis Amendment Number One modifies the Player Registration and\nServices Contract PC-2026-011.\n\n[AMD-PC-011-01 §2] 2. AMENDED RETAINER FEE\n\nSection 4 of PC-2026-011 is amended. The annual retainer of\n9,000,000 Indian rupees is replaced with an annual retainer of\n13,500,000 Indian rupees, reflecting the Player's appointment as\nvice captain.\n\n[AMD-PC-011-01 §3] 3. AMENDED TERMINATION NOTICE\n\nSection 8 of PC-2026-011 is amended. The notice period of\n60 days is replaced with a notice period of 90 days.\n\n[AMD-PC-011-01 §4] 4. EFFECTIVE DATE\n\nThis amendment takes effect on 1 January 2026 and applies from\nthe 2026 season onwards.\n\n[AMD-PC-011-01 §5] 5. NO OTHER CHANGES\n\nAll other provisions of PC-2026-011, including the Match Fee of\n150,000 Indian rupees in Section 5, remain unchanged.\n\n[AMD-PC-011-01 §6] 6. ORDER OF PRECEDENCE\n\nIf this amendment conflicts with PC-2026-011, this amendment\ncontrols for the sections it amends.",
+          "server": "clause-search",
+          "redactions": [],
+          "usage": {
+            "inputTokens": 2067,
+            "outputTokens": 89
+          },
+          "modelMs": 1149,
+          "toolMs": 7
+        },
+        {
+          "step": 4,
+          "thought": "We found that Rohan Sharma's termination notice period in PC-2026-011 §8 is 60 days, but AMD-PC-011-01 §3 amends it to 90 days. Now let's find the termination notice period for Dinesh Mendis in contract PC-2026-027.",
+          "action": "search_clauses",
+          "input": {
+            "query": "termination notice period",
+            "contract_id": "PC-2026-027"
+          },
+          "observation": "[PC-2026-027 §8] 8. TERMINATION\n\nEither party may terminate this contract by giving 30 days\nwritten notice. The Franchise may also terminate if the Player\nfails to obtain a no objection certificate from his home board.\n\n[PC-2026-027 §2] 2. DEFINITIONS\n\n\"Season\" means the period from the first league match to the\nfinal, including play-offs. \"Match Fee\" means the amount payable\nfor each match in which the Player is named in the playing\neleven. \"Franchise Activity\" means training, travel, media, and\nsponsor appearances required by the Franchise.\n\n[PC-2026-027 §3] 3. CONTRACT TERM\n\nThis contract runs for one season only, covering the 2026\nseason, with an option to extend by mutual written agreement.",
+          "server": "clause-search",
+          "redactions": [],
+          "usage": {
+            "inputTokens": 2526,
+            "outputTokens": 117
+          },
+          "modelMs": 1626,
+          "toolMs": 1531
+        },
+        {
+          "step": 5,
+          "thought": "We have found Dinesh Mendis's termination notice period in PC-2026-027 §8 is 30 days. Let's check if there are any amendments modifying PC-2026-027.",
+          "action": "find_amendments",
+          "input": {
+            "contract_id": "PC-2026-027"
+          },
+          "observation": "No amendments modify PC-2026-027. Its own clauses are current.",
+          "server": "clause-search",
+          "redactions": [],
+          "usage": {
+            "inputTokens": 2836,
+            "outputTokens": 85
+          },
+          "modelMs": 1177,
+          "toolMs": 55
+        },
+        {
+          "step": 6,
+          "thought": "We have all the required information: Rohan Sharma has a termination notice period of 90 days (originally 60 days in [PC-2026-011 §8], amended by [AMD-PC-011-01 §3]). Dinesh Mendis has a termination notice period of 30 days ([PC-2026-027 §8], with no amendments). Therefore, Rohan Sharma has the longer termination notice period today.",
+          "action": "finish",
+          "input": {
+            "answer": "Rohan Sharma has the longer termination notice period today. Rohan Sharma's termination notice period is 90 days (set by [PC-2026-011 §8] and amended by [AMD-PC-011-01 §3]), whereas Dinesh Mendis's termination notice period is 30 days ([PC-2026-027 §8])."
+          },
+          "observation": "(done)",
+          "server": null,
+          "redactions": [],
+          "usage": {
+            "inputTokens": 2412,
+            "outputTokens": 202
+          },
+          "modelMs": 1682,
+          "toolMs": 0
+        }
+      ],
+      "squad": null
+    },
+    {
+      "caseId": "M01",
+      "type": "multi-step",
+      "group": "multi-step",
+      "contender": "squad",
+      "attempt": 1,
+      "answer": "Rohan Sharma has the longer termination notice period today. Rohan Sharma's period is 90 days [AMD-PC-011-01 §3], and Dinesh Mendis's period is 30 days [PC-2026-027 §8].",
+      "passed": true,
+      "failures": [],
+      "stopReason": "finished",
+      "llmCalls": 8,
+      "inputTokens": 6550,
+      "outputTokens": 884,
+      "cost": 0.005927,
+      "activeMs": 7015,
+      "busyMs": 14323,
+      "wallMs": 51629,
+      "byRole": {
+        "manager": {
+          "calls": 2,
+          "inputTokens": 1608,
+          "outputTokens": 328
+        },
+        "clause-researcher": {
+          "calls": 4,
+          "inputTokens": 3581,
+          "outputTokens": 330
+        },
+        "amendment-checker": {
+          "calls": 2,
+          "inputTokens": 1361,
+          "outputTokens": 226
+        }
+      },
+      "steps": [],
+      "squad": {
+        "thought": "To determine who has the longer termination notice period today between Rohan Sharma and Dinesh Mendis, we need to check the termination notice clauses in their respective player contracts (PC-2026-011 for Rohan Sharma, and PC-2026-027 for Dinesh Mendis) and also check if any amendments (such as AMD-PC-011-01) have modified Rohan Sharma's termination notice period.",
+        "manager": [
+          {
+            "name": "plan",
+            "text": "```json\n{\n  \"thought\": \"To determine who has the longer termination notice period today between Rohan Sharma and Dinesh Mendis, we need to check the termination notice clauses in their respective player contracts (PC-2026-011 for Rohan Sharma, and PC-2026-027 for Dinesh Mendis) and also check if any amendments (such as AMD-PC-011-01) have modified Rohan Sharma's termination notice period.\",\n  \"tasks\": [\n    {\n      \"to\": \"clause-researcher\",\n      \"contract_id\": \"PC-2026-011\",\n      \"task\": \"What is the termination notice period?\"\n    },\n    {\n      \"to\": \"amendment-checker\",\n      \"contract_id\": \"PC-2026-011\",\n      \"task\": \"Has the termination notice period been amended, and to what?\"\n    },\n    {\n      \"to\": \"clause-researcher\",\n      \"contract_id\": \"PC-2026-027\",\n      \"task\": \"What is the termination notice period?\"\n    }\n  ]\n}\n```",
+            "usage": {
+              "inputTokens": 1094,
+              "outputTokens": 267
+            },
+            "ms": 1416
+          },
+          {
+            "name": "answer",
+            "text": "Rohan Sharma has the longer termination notice period today. Rohan Sharma's period is 90 days [AMD-PC-011-01 §3], and Dinesh Mendis's period is 30 days [PC-2026-027 §8].",
+            "usage": {
+              "inputTokens": 514,
+              "outputTokens": 61
+            },
+            "ms": 1318
+          }
+        ],
+        "tasks": [
+          {
+            "to": "clause-researcher",
+            "contractId": "PC-2026-011",
+            "task": "What is the termination notice period?",
+            "id": "t1",
+            "states": [
+              {
+                "state": "submitted",
+                "at": "2026-10-21T06:03:19.667Z"
+              },
+              {
+                "state": "working",
+                "at": "2026-10-21T06:03:19.667Z"
+              },
+              {
+                "state": "completed",
+                "at": "2026-10-21T06:03:45.456Z"
+              }
+            ],
+            "report": "The termination notice period for contract PC-2026-011 is 60 days of written notice, as stated in [PC-2026-011 §8].",
+            "run": {
+              "question": "Contract PC-2026-011: What is the termination notice period?",
+              "answer": "The termination notice period for contract PC-2026-011 is 60 days of written notice, as stated in [PC-2026-011 §8].",
+              "stopReason": "finished",
+              "steps": [
+                {
+                  "step": 1,
+                  "thought": "I need to find the termination notice period for contract PC-2026-011. I will search for clauses related to termination notice within that specific contract.",
+                  "action": "search_clauses",
+                  "input": {
+                    "query": "termination notice",
+                    "contract_id": "PC-2026-011"
+                  },
+                  "observation": "[PC-2026-011 §8] 8. TERMINATION\n\nEither party may terminate this contract by giving 60 days\nwritten notice. The Franchise may terminate immediately for a\nLevel 4 offence under the Code of Conduct.\n\n[PC-2026-011 §3] 3. CONTRACT TERM\n\nThis contract runs for two seasons beginning with the 2026\nseason and ending after the 2027 final.\n\n[PC-2026-011 §?] PLAYER REGISTRATION AND SERVICES CONTRACT\nFor RAG Training Purposes Only\n\nContract ID: PC-2026-011",
+                  "server": "clause-search",
+                  "redactions": [],
+                  "usage": {
+                    "inputTokens": 781,
+                    "outputTokens": 75
+                  },
+                  "modelMs": 1265,
+                  "toolMs": 1502
+                },
+                {
+                  "step": 2,
+                  "thought": "I have found the termination clause [PC-2026-011 §8] which states that either party may terminate the contract by giving 60 days written notice.",
+                  "action": "finish",
+                  "input": {
+                    "answer": "The termination notice period for contract PC-2026-011 is 60 days of written notice, as stated in [PC-2026-011 §8]."
+                  },
+                  "observation": "(done)",
+                  "server": null,
+                  "redactions": [],
+                  "usage": {
+                    "inputTokens": 997,
+                    "outputTokens": 98
+                  },
+                  "modelMs": 1209,
+                  "toolMs": 0
+                }
+              ],
+              "llmCalls": 2,
+              "usage": {
+                "inputTokens": 1778,
+                "outputTokens": 173
+              },
+              "activeMs": 3976,
+              "wallMs": 25789,
+              "tools": [
+                "list_contracts",
+                "search_clauses",
+                "read_section"
+              ],
+              "observedLabels": [
+                "PC-2026-011 §8",
+                "PC-2026-011 §3"
+              ],
+              "defences": {
+                "sanitiseDocuments": false,
+                "validateCitations": false,
+                "requireAmendmentCheck": false
+              },
+              "redactions": [],
+              "gateRejections": []
+            }
+          },
+          {
+            "to": "amendment-checker",
+            "contractId": "PC-2026-011",
+            "task": "Has the termination notice period been amended, and to what?",
+            "id": "t2",
+            "states": [
+              {
+                "state": "submitted",
+                "at": "2026-10-21T06:03:19.667Z"
+              },
+              {
+                "state": "working",
+                "at": "2026-10-21T06:03:19.667Z"
+              },
+              {
+                "state": "completed",
+                "at": "2026-10-21T06:03:53.945Z"
+              }
+            ],
+            "report": "Yes, the termination notice period has been amended. Amendment AMD-PC-011-01 §3 replaces Section 8 of PC-2026-011, changing the termination notice period from 60 days to 90 days [AMD-PC-011-01 §3].",
+            "run": {
+              "question": "Contract PC-2026-011: Has the termination notice period been amended, and to what?",
+              "answer": "Yes, the termination notice period has been amended. Amendment AMD-PC-011-01 §3 replaces Section 8 of PC-2026-011, changing the termination notice period from 60 days to 90 days [AMD-PC-011-01 §3].",
+              "stopReason": "finished",
+              "steps": [
+                {
+                  "step": 1,
+                  "thought": "I need to find all amendments for contract PC-2026-011 to determine if the termination notice period has been amended.",
+                  "action": "find_amendments",
+                  "input": {
+                    "contract_id": "PC-2026-011"
+                  },
+                  "observation": "1 amendment(s) modify PC-2026-011:\n\n[AMD-PC-011-01 §1] 1. PURPOSE\n\nThis Amendment Number One modifies the Player Registration and\nServices Contract PC-2026-011.\n\n[AMD-PC-011-01 §2] 2. AMENDED RETAINER FEE\n\nSection 4 of PC-2026-011 is amended. The annual retainer of\n9,000,000 Indian rupees is replaced with an annual retainer of\n13,500,000 Indian rupees, reflecting the Player's appointment as\nvice captain.\n\n[AMD-PC-011-01 §3] 3. AMENDED TERMINATION NOTICE\n\nSection 8 of PC-2026-011 is amended. The notice period of\n60 days is replaced with a notice period of 90 days.\n\n[AMD-PC-011-01 §4] 4. EFFECTIVE DATE\n\nThis amendment takes effect on 1 January 2026 and applies from\nthe 2026 season onwards.\n\n[AMD-PC-011-01 §5] 5. NO OTHER CHANGES\n\nAll other provisions of PC-2026-011, including the Match Fee of\n150,000 Indian rupees in Section 5, remain unchanged.\n\n[AMD-PC-011-01 §6] 6. ORDER OF PRECEDENCE\n\nIf this amendment conflicts with PC-2026-011, this amendment\ncontrols for the sections it amends.",
+                  "server": "clause-search",
+                  "redactions": [],
+                  "usage": {
+                    "inputTokens": 464,
+                    "outputTokens": 63
+                  },
+                  "modelMs": 1068,
+                  "toolMs": 3
+                },
+                {
+                  "step": 2,
+                  "thought": "I have found the amendment modifying contract PC-2026-011. Section 3 of AMD-PC-011-01 amends Section 8 of PC-2026-011, replacing the notice period of 60 days with a notice period of 90 days. Now I can finish the task with the answer.",
+                  "action": "finish",
+                  "input": {
+                    "answer": "Yes, the termination notice period has been amended. Amendment AMD-PC-011-01 §3 replaces Section 8 of PC-2026-011, changing the termination notice period from 60 days to 90 days [AMD-PC-011-01 §3]."
+                  },
+                  "observation": "(done)",
+                  "server": null,
+                  "redactions": [],
+                  "usage": {
+                    "inputTokens": 897,
+                    "outputTokens": 163
+                  },
+                  "modelMs": 3200,
+                  "toolMs": 0
+                }
+              ],
+              "llmCalls": 2,
+              "usage": {
+                "inputTokens": 1361,
+                "outputTokens": 226
+              },
+              "activeMs": 4271,
+              "wallMs": 34278,
+              "tools": [
+                "find_amendments",
+                "get_amendment_chain"
+              ],
+              "observedLabels": [
+                "AMD-PC-011-01 §1",
+                "AMD-PC-011-01 §2",
+                "AMD-PC-011-01 §3",
+                "AMD-PC-011-01 §4",
+                "AMD-PC-011-01 §5",
+                "AMD-PC-011-01 §6"
+              ],
+              "defences": {
+                "sanitiseDocuments": false,
+                "validateCitations": false,
+                "requireAmendmentCheck": false
+              },
+              "redactions": [],
+              "gateRejections": []
+            }
+          },
+          {
+            "to": "clause-researcher",
+            "contractId": "PC-2026-027",
+            "task": "What is the termination notice period?",
+            "id": "t3",
+            "states": [
+              {
+                "state": "submitted",
+                "at": "2026-10-21T06:03:19.667Z"
+              },
+              {
+                "state": "working",
+                "at": "2026-10-21T06:03:19.667Z"
+              },
+              {
+                "state": "completed",
+                "at": "2026-10-21T06:03:58.093Z"
+              }
+            ],
+            "report": "The termination notice period is 30 days [PC-2026-027 §8].",
+            "run": {
+              "question": "Contract PC-2026-027: What is the termination notice period?",
+              "answer": "The termination notice period is 30 days [PC-2026-027 §8].",
+              "stopReason": "finished",
+              "steps": [
+                {
+                  "step": 1,
+                  "thought": "I need to find the termination notice period in contract PC-2026-027. I will search for clauses related to termination notice within that specific contract.",
+                  "action": "search_clauses",
+                  "input": {
+                    "query": "termination notice",
+                    "contract_id": "PC-2026-027"
+                  },
+                  "observation": "[PC-2026-027 §8] 8. TERMINATION\n\nEither party may terminate this contract by giving 30 days\nwritten notice. The Franchise may also terminate if the Player\nfails to obtain a no objection certificate from his home board.\n\n[PC-2026-027 §3] 3. CONTRACT TERM\n\nThis contract runs for one season only, covering the 2026\nseason, with an option to extend by mutual written agreement.\n\n[PC-2026-027 §6] 6. PLAYER AVAILABILITY\n\nThe Player must report to the team camp no later than 7 days\nbefore the first league match of the Season, and must obtain a\nno objection certificate from his home board before joining.",
+                  "server": "clause-search",
+                  "redactions": [],
+                  "usage": {
+                    "inputTokens": 781,
+                    "outputTokens": 76
+                  },
+                  "modelMs": 942,
+                  "toolMs": 1542
+                },
+                {
+                  "step": 2,
+                  "thought": "I have found the termination notice period in contract PC-2026-027 §8, which states that either party may terminate the contract by giving 30 days written notice.",
+                  "action": "finish",
+                  "input": {
+                    "answer": "The termination notice period is 30 days [PC-2026-027 §8]."
+                  },
+                  "observation": "(done)",
+                  "server": null,
+                  "redactions": [],
+                  "usage": {
+                    "inputTokens": 1022,
+                    "outputTokens": 81
+                  },
+                  "modelMs": 848,
+                  "toolMs": 0
+                }
+              ],
+              "llmCalls": 2,
+              "usage": {
+                "inputTokens": 1803,
+                "outputTokens": 157
+              },
+              "activeMs": 3332,
+              "wallMs": 38426,
+              "tools": [
+                "list_contracts",
+                "search_clauses",
+                "read_section"
+              ],
+              "observedLabels": [
+                "PC-2026-027 §8",
+                "PC-2026-027 §3",
+                "PC-2026-027 §6"
+              ],
+              "defences": {
+                "sanitiseDocuments": false,
+                "validateCitations": false,
+                "requireAmendmentCheck": false
+              },
+              "redactions": [],
+              "gateRejections": []
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
