@@ -6,7 +6,7 @@ export const maxDuration = 120;
 
 export async function POST(request: Request) {
   try {
-    const { question, mode } = await request.json();
+    const { question, mode, user, role } = await request.json();
 
     if (!question || typeof question !== "string") {
       return NextResponse.json(
@@ -16,7 +16,17 @@ export async function POST(request: Request) {
     }
 
     const searchMode: SearchMode = mode === "hybrid" ? "hybrid" : "vector";
-    const result = await askQuestion(question, searchMode);
+
+    // Week 11: who asked is logged with every request — the user slice of a
+    // complaint. A real deployment takes it from the session; this app has
+    // none, so it is accepted from the body or a header.
+    const result = await askQuestion(question, searchMode, {
+      channel: "web",
+      user: {
+        id: String(user ?? request.headers.get("x-user-id") ?? "anonymous"),
+        role: String(role ?? request.headers.get("x-user-role") ?? "unknown"),
+      },
+    });
 
     return NextResponse.json({
       success: true,

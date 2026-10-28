@@ -1,0 +1,73 @@
+$ GEMINI_MODEL=gemini-3.5-flash-lite npm run eval -- --prompt rag-answer@1 --label week11-red --validate
+# run at 2026-10-28 12:01:56 IST — BEFORE rag-answer@2 exists (lib/prompts.ts has only rag-answer@1); judge prompt clarified that a refusal is always "refused"
+
+Legal contract RAG — test set
+  retrieval : hybrid
+  embeddings: gemini:gemini-embedding-001
+  generator : gemini:gemini-3.5-flash-lite
+  prompt    : rag-answer@1
+  cases     : 17
+
+  FAIL  T01  wrong-contract   What is the termination notice period in PC-2026-0
+         ↳ retrieved-gold, did-not-refuse, states:30 days, cites-a-source
+         ↳ judge: supported — The answer correctly points out that the excerpts do not contain information about PC-2026-027, but this means it refused to answer the user's specific question.
+  FAIL  T02  wrong-contract   What is the match fee in PC-2026-027?
+         ↳ retrieved-gold, did-not-refuse, states:110000|1.1 lakh, cites-a-source
+         ↳ judge: refused — The assistant refused to answer the question.
+  PASS  T03  wrong-contract   How many days before the first match must the play
+  PASS  T04  orphaned-clause  Where are disputes under Dinesh Mendis's player co
+  PASS  T05  orphaned-clause  What is the transfer fee under TRF-2026-008?
+  PASS  T06  orphaned-clause  How is Rohan Sharma's retainer paid out across the
+  PASS  T07  superseded-value What is Rohan Sharma's current annual retainer?
+  PASS  T08  superseded-value What is the current termination notice period for 
+  PASS  T09  superseded-value How much written notice is needed to terminate the
+  PASS  T10  unanswerable     What is the notice period to end the stadium agree
+  PASS  T11  unanswerable     Can Meridian Sports Network show matches in Austra
+  PASS  T12  unanswerable     What is the buyout clause in Rohan Sharma's contra
+  PASS  T13  straightforward  How many overseas players may appear in the playin
+  PASS  T14  straightforward  A player has just reached 8 demerit points. How ma
+  PASS  T15  straightforward  How quickly must a player report to doping control
+  PASS  T16  straightforward  What share of net ticket revenue does the club kee
+  FAIL  T17  superseded-value How much notice does Rohan Sharma need to give to 
+         ↳ retrieved-gold, states:90 days, cites-gold
+
+  Score by problem type
+
+  problem type       passed   rate
+  --------------------------------------
+  wrong-contract     1/3      33%
+  orphaned-clause    3/3      100%
+  superseded-value   3/4      75%
+  unanswerable       3/3      100%
+  straightforward    4/4      100%
+  --------------------------------------
+  OVERALL            14/17    82%
+
+  Regression tests (real past failures): 3/6 passing
+  Failing: T01, T02, T17
+
+
+Judge validation — does it agree with my own grading?
+
+  DISAGREE  W4-Q08       human=refused     judge=supported   — judge said: The assistant correctly refused to answer because the excerpts do not contain information regarding PC-2026-027.
+  agree     W4-Q11       human=supported   judge=supported   
+  agree     W4-Q13       human=supported   judge=supported   
+  agree     W4-Q16       human=supported   judge=supported   
+  DISAGREE  W4-OLD-Q13   human=refused     judge=unsupported — judge said: The answer claims the excerpts do not mention 'AlphaTech', but excerpt [3] explicitly mentions 'AlphaTech Solutions', and the excerpts clearly state a 60-day written notice is required.
+  agree     W4-OLD-Q11   human=unsupported judge=unsupported 
+
+  agreement: 4/6 = 67%
+  Below 80% — do NOT quote this judge's scores until it is fixed.
+
+  saved → evals/week11-red.json
+
+  Delta vs after (hybrid retrieval → hybrid)
+
+  problem type       after    week11-red change
+  --------------------------------------------------
+  wrong-contract     1/3      1/3      same
+  orphaned-clause    3/3      3/3      same
+  superseded-value   3/3      3/4      REGRESSED
+  unanswerable       3/3      3/3      same
+  straightforward    4/4      4/4      same
+

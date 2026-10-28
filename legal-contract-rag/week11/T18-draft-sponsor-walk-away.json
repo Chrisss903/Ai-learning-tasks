@@ -1,0 +1,42 @@
+{
+  "id": "T18",
+  "type": "wrong-contract",
+  "question": "What notice does the sponsor need to give to walk away from the deal?",
+  "gold": [
+    {
+      "source": "sponsorship-agreement.txt",
+      "section": "8"
+    }
+  ],
+  "answerMustInclude": [
+    "90 days"
+  ],
+  "citeGold": true,
+  "mustNotCite": [
+    {
+      "source": "service-agreement.txt",
+      "section": "5"
+    },
+    {
+      "source": "contract-amendment.txt",
+      "section": "2"
+    }
+  ],
+  "regression": true,
+  "fromTrace": "58032cddea07f37f236fe7f3bc67a431",
+  "note": "Found by the week 11 shadow replay, not the drill: rag-answer@1 AND rag-answer@3 both answer from the AlphaTech service agreement. The question names no contract ('sponsor' is a generic word to resolveContracts), so search is unscoped and SPN-2026-014 §8 never reaches the model.",
+  "observed": {
+    "ts": "2026-10-26T10:21:53.000Z",
+    "user": {
+      "id": "a.iyer",
+      "role": "lawyer"
+    },
+    "prompt_version": "rag-answer@1",
+    "context": [
+      "[1] AMD-PC-011-01 §3",
+      "[2] AMD-2026-001 §2",
+      "[3] SA-2026-001 §5"
+    ],
+    "answer": "Based on the provided contract excerpts, the original termination notice requirement of 30 days [3] was first amended to 60 days [2], and subsequently amended again to a notice period of 90 days [1]. Therefore, the required notice to terminate the agreement is 90 days [1]."
+  }
+}

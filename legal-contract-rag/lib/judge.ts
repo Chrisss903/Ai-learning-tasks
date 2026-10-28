@@ -32,6 +32,8 @@ Decide two things.
    - "unsupported" — the answer asserts something the excerpts do not support,
                      including a value that an amendment in the excerpts replaced.
    - "refused"     — the answer declines to answer or says it does not know.
+                     This wins over "supported": a refusal is "refused" even
+                     when refusing was the right thing to do.
 
 2. answersQuestion: true if the answer addresses what was asked, false if it is
    about a different contract, a different clause, or evades the question.
@@ -61,17 +63,26 @@ function extractJson(text: string): Judgement {
   };
 }
 
+/**
+ * Week 11: `shown` is the excerpts exactly as the model saw them. A prompt
+ * version that labels excerpts differently must be judged against those
+ * labels, or a correct answer reads as unsupported. Under rag-answer@1 it is
+ * byte-identical to the format below.
+ */
 export async function judgeAnswer(
   question: string,
   retrieved: SearchResult[],
   answer: string,
+  shown?: string,
 ): Promise<Judgement> {
-  const excerpts = retrieved
-    .map(
-      (source, index) =>
-        `[${index + 1}] (${source.source} — ${source.section})\n${source.text}`,
-    )
-    .join("\n\n");
+  const excerpts =
+    shown ??
+    retrieved
+      .map(
+        (source, index) =>
+          `[${index + 1}] (${source.source} — ${source.section})\n${source.text}`,
+      )
+      .join("\n\n");
 
   const response = await resolveGenerator().complete([
     { role: "system", content: SYSTEM_PROMPT },

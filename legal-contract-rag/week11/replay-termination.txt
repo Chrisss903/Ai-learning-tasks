@@ -1,0 +1,98 @@
+$ GEMINI_MODEL=gemini-3.5-flash-lite npm run replay -- --prompt rag-answer@3 --type termination
+
+replaying 23 logged request(s) under rag-answer@3 · type termination
+
+53db969e  d.shah · How much written notice is needed to terminate the AlphaTech service agreement?
+   rag-answer@1: cites AMD-2026-001 §2 — To terminate the agreement, either party must provide 60 days of written notice [1].
+   rag-answer@3: cites AMD-2026-001 §2, SA-2026-001 §5 — To terminate the Service Agreement (SA-2026-001), either party must provide 60 days written notice [6]. This r
+
+83f02ef4  s.khan · How much notice must BetaWorks give to end the AlphaTech agreement?
+   rag-answer@1: REFUSED — I don't know.
+   rag-answer@3: cites AMD-2026-001 §2, SA-2026-001 §5 — Based on the contract amendments and excerpts provided for SA-2026-001 and AMD-2026-001, either party must pro
+
+28ec5af1  s.khan · What is the current termination notice period for PC-2026-011?
+   rag-answer@1: cites AMD-PC-011-01 §3 — The current termination notice period for PC-2026-011 is 90 days [1].
+   rag-answer@3: cites AMD-PC-011-01 §3, PC-2026-011 §8 — The current termination notice period is 90 days [3]. (Note: Originally, Section 8 of PC-2026-011 provided for
+
+73fe41d2  r.menon · How does Sharma's termination notice compare with Mendis's?
+   rag-answer@1: REFUSED — I don't know.
+   rag-answer@3: cites PC-2026-011 §8, AMD-PC-011-01 §3, PC-2026-027 §8 — Based on the provided contract excerpts: * **Rohan Sharma's contract (PC-2026-011):** Originally, either party
+
+771a4e8f  r.menon · What is the termination notice period in PC-2026-027?
+   rag-answer@1: REFUSED — I don't know.
+   rag-answer@3: cites PC-2026-027 §8 — Based on contract PC-2026-027, the termination notice period is 30 days of written notice [2].
+
+bc2b2ed7  a.iyer · How much notice does Rohan Sharma need to give to terminate his contract?
+   rag-answer@1: cites PC-2026-011 §8 — Rohan Sharma needs to give 60 days written notice to terminate his contract [3].
+   rag-answer@3: cites AMD-PC-011-01 §3, PC-2026-011 §8 — To terminate the contract, a party must give a notice period of 90 days [3], replacing the original 60-day not
+
+580d70ef  m.joseph · What is the current termination notice period for PC-2026-011?
+   rag-answer@1: cites AMD-PC-011-01 §3 — Based on the provided contract excerpts, the current termination notice period for PC-2026-011 is 90 days [1].
+   rag-answer@3: cites AMD-PC-011-01 §3, PC-2026-011 §8 (cache hit) — The current termination notice period is 90 days [3]. (Note: Originally, Section 8 of PC-2026-011 provided for
+
+008a45bf  r.menon · How does Sharma's termination notice compare with Mendis's?
+   rag-answer@1: REFUSED — I don't know. The provided contract excerpts do not mention Sharma or Mendis.
+   rag-answer@3: cites PC-2026-011 §8, AMD-PC-011-01 §3, PC-2026-027 §8 (cache hit) — Based on the provided contract excerpts: * **Rohan Sharma's contract (PC-2026-011):** Originally, either party
+
+a39c072c  p.nair · How much notice is needed to end the sponsorship agreement?
+   rag-answer@1: REFUSED — I don't know.
+   rag-answer@3: cites SPN-2026-014 §8 — To terminate the sponsorship agreement, either party must provide 90 days of written notice before the start o
+
+682f8b6a  r.menon · Can Chennai Chargers terminate Rohan Sharma immediately for a Level 4 offence?
+   rag-answer@1: cites COC-2026 §5 — Yes, a Level 4 offence may lead to the immediate termination of the player's contract [2].
+   rag-answer@3: cites PC-2026-011 §8 — Yes, the Franchise may terminate immediately for a Level 4 offence under the Code of Conduct [2]. (This portio
+
+0c9e3b54  t.das · How does Sharma's termination notice compare with Mendis's?
+   rag-answer@1: REFUSED — I don't know.
+   rag-answer@3: cites PC-2026-011 §8, AMD-PC-011-01 §3, PC-2026-027 §8 (cache hit) — Based on the provided contract excerpts: * **Rohan Sharma's contract (PC-2026-011):** Originally, either party
+
+10cbac9a  p.nair · Can the franchise terminate Mendis if he doesn't get his no objection certificate?
+   rag-answer@1: cites PC-2026-027 §8 — Yes, the Franchise may terminate the contract if the Player fails to obtain a no objection certificate from hi
+   rag-answer@3: cites PC-2026-027 §8 — Yes, the Franchise may terminate the contract if the Player fails to obtain a no objection certificate from hi
+
+016009e0  r.menon · How much notice is needed to end the sponsorship agreement?
+   rag-answer@1: REFUSED — I don't know.
+   rag-answer@3: cites SPN-2026-014 §8 (cache hit) — To terminate the sponsorship agreement, either party must provide 90 days of written notice before the start o
+
+58032cdd  a.iyer · What notice does the sponsor need to give to walk away from the deal?
+   rag-answer@1: cites SA-2026-001 §5, AMD-2026-001 §2, AMD-PC-011-01 §3 — Based on the provided contract excerpts, the original termination notice requirement of 30 days [3] was first 
+   rag-answer@3: cites SA-2026-001 §5, AMD-2026-001 §2 — Based on the provided excerpts, the termination notice period for SA-2026-001 is originally 30 days [3], but i
+
+2d4c11e8  s.khan · What is the buyout clause in Rohan Sharma's contract?
+   rag-answer@1: REFUSED — I don't know.
+   rag-answer@3: REFUSED — I don't know [1, 2, 3, 4].
+
+20baf451  p.nair · Can a franchise be thrown out of the league?
+   rag-answer@1: cites FA-2025-003 §9 — Yes, the League may terminate the agreement (throw a franchise out of the league) on 90 days notice if the Fra
+   rag-answer@3: cites FA-2025-003 §9 — Yes. The League may terminate the franchise agreement on 90 days notice if the Franchise fails to pay the fran
+
+6c03b1b4  r.menon · How much notice is needed to end the sponsorship agreement?
+   rag-answer@1: REFUSED — I don't know.
+   rag-answer@3: cites SPN-2026-014 §8 (cache hit) — To terminate the sponsorship agreement, either party must provide 90 days of written notice before the start o
+
+caf55f4c  a.iyer · Can a franchise be thrown out of the league?
+   rag-answer@1: cites FA-2025-003 §9 — Yes, the League may terminate the agreement on 90 days notice if the Franchise fails to pay the franchise fee 
+   rag-answer@3: cites FA-2025-003 §9 (cache hit) — Yes. The League may terminate the franchise agreement on 90 days notice if the Franchise fails to pay the fran
+
+72d546a7  r.menon · Can the franchise terminate Mendis if he doesn't get his no objection certificate?
+   rag-answer@1: cites PC-2026-027 §8 — Yes, the Franchise may terminate the contract if the Player fails to obtain a no objection certificate from hi
+   rag-answer@3: cites PC-2026-027 §8 (cache hit) — Yes, the Franchise may terminate the contract if the Player fails to obtain a no objection certificate from hi
+
+ab08b97a  s.khan · What is the termination notice period in PC-2026-027?
+   rag-answer@1: REFUSED — I don't know, as the provided contract excerpts do not contain information about PC-2026-027.
+   rag-answer@3: cites PC-2026-027 §8 (cache hit) — Based on contract PC-2026-027, the termination notice period is 30 days of written notice [2].
+
+4656ec6b  p.nair · How does Sharma's termination notice compare with Mendis's?
+   rag-answer@1: REFUSED — I don't know.
+   rag-answer@3: cites PC-2026-011 §8, AMD-PC-011-01 §3, PC-2026-027 §8 (cache hit) — Based on the provided contract excerpts: * **Rohan Sharma's contract (PC-2026-011):** Originally, either party
+
+9334ee67  a.iyer · What is the buyout clause in Rohan Sharma's contract?
+   rag-answer@1: REFUSED — I don't know.
+   rag-answer@3: REFUSED (cache hit) — I don't know [1, 2, 3, 4].
+
+4787b178  r.menon · How much notice must BetaWorks give to end the AlphaTech agreement?
+   rag-answer@1: REFUSED — I don't know.
+   rag-answer@3: cites AMD-2026-001 §2, SA-2026-001 §5 (cache hit) — Based on the contract amendments and excerpts provided for SA-2026-001 and AMD-2026-001, either party must pro
+
+refused: 13/23 before → 2/23 under rag-answer@3
+answer cache: 11/23 hits (48%) · mean cost per request $0.000179

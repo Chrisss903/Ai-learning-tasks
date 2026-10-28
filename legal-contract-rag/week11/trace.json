@@ -1,0 +1,179 @@
+{
+  "trace_id": "bc2b2ed7c7159e527a4d37fd549d4cf2",
+  "ts": "2026-10-22T09:37:31.000Z",
+  "clock": "simulated",
+  "channel": "web",
+  "user": {
+    "id": "a.iyer",
+    "role": "lawyer"
+  },
+  "input": {
+    "question": "How much notice does Rohan Sharma need to give to terminate his contract?",
+    "type": "termination",
+    "contracts": [
+      "PC-2026-011"
+    ]
+  },
+  "prompt_version": "rag-answer@1",
+  "model": "gemini:gemini-3.5-flash-lite",
+  "embedding_model": "gemini:gemini-embedding-001",
+  "retrieval": {
+    "mode": "hybrid",
+    "top_k": 3,
+    "context": [
+      {
+        "n": 1,
+        "chunk_id": 72,
+        "label": "PC-2026-011 §1",
+        "source": "player-contract-sharma.txt",
+        "section": "1. PARTIES",
+        "via": "search",
+        "vector_rank": 1,
+        "keyword_rank": 2
+      },
+      {
+        "n": 2,
+        "chunk_id": 67,
+        "label": "PC-2026-027 §8",
+        "source": "player-contract-mendis.txt",
+        "section": "8. TERMINATION",
+        "via": "search",
+        "vector_rank": 2,
+        "keyword_rank": 1
+      },
+      {
+        "n": 3,
+        "chunk_id": 79,
+        "label": "PC-2026-011 §8",
+        "source": "player-contract-sharma.txt",
+        "section": "8. TERMINATION",
+        "via": "search",
+        "vector_rank": 4,
+        "keyword_rank": 3
+      }
+    ]
+  },
+  "output": {
+    "answer": "Rohan Sharma needs to give 60 days written notice to terminate his contract [3].",
+    "cited_excerpts": [
+      3
+    ],
+    "refused": false
+  },
+  "spans": [
+    {
+      "span_id": "a5c72c83ec6c99b6",
+      "parent_id": null,
+      "name": "retrieval.search",
+      "stage": "retrieval",
+      "start_ms": 1,
+      "duration_ms": 2038,
+      "status": "ok",
+      "cost_usd": 0,
+      "attributes": {
+        "mode": "hybrid",
+        "top_k": 3
+      }
+    },
+    {
+      "span_id": "8954962bf9d45217",
+      "parent_id": "a5c72c83ec6c99b6",
+      "name": "retrieval.embed",
+      "stage": "retrieval",
+      "start_ms": 2,
+      "duration_ms": 583,
+      "status": "ok",
+      "cost_usd": 0.0000028500000000000002,
+      "attributes": {
+        "gen_ai.request.model": "gemini:gemini-embedding-001",
+        "cache": "miss"
+      },
+      "tokens": {
+        "input": 19,
+        "output": 0,
+        "estimated": true
+      }
+    },
+    {
+      "span_id": "d9e3f429daad3142",
+      "parent_id": "a5c72c83ec6c99b6",
+      "name": "retrieval.keyword",
+      "stage": "retrieval",
+      "start_ms": 5,
+      "duration_ms": 5,
+      "status": "ok",
+      "cost_usd": 0,
+      "attributes": {
+        "index": "bm25",
+        "limit": 20,
+        "returned": 20
+      }
+    },
+    {
+      "span_id": "c176a77a6014f8c3",
+      "parent_id": "a5c72c83ec6c99b6",
+      "name": "retrieval.vector",
+      "stage": "retrieval",
+      "start_ms": 585,
+      "duration_ms": 1453,
+      "status": "ok",
+      "cost_usd": 0,
+      "attributes": {
+        "db.system": "qdrant",
+        "collection": "legal_documents",
+        "limit": 20,
+        "returned": 20
+      }
+    },
+    {
+      "span_id": "2957dc86335859f3",
+      "parent_id": "a5c72c83ec6c99b6",
+      "name": "retrieval.fuse",
+      "stage": "retrieval",
+      "start_ms": 2038,
+      "duration_ms": 1,
+      "status": "ok",
+      "cost_usd": 0,
+      "attributes": {
+        "method": "rrf",
+        "k": 60
+      }
+    },
+    {
+      "span_id": "316a4b5974b489b9",
+      "parent_id": null,
+      "name": "generation.answer",
+      "stage": "generation",
+      "start_ms": 2039,
+      "duration_ms": 2457,
+      "status": "ok",
+      "cost_usd": 0.0001285,
+      "attributes": {
+        "gen_ai.request.model": "gemini:gemini-3.5-flash-lite",
+        "prompt_version": "rag-answer@1",
+        "provider_ms": 2457,
+        "queue_ms": 0,
+        "attempts": 1,
+        "throttled": 0
+      },
+      "tokens": {
+        "input": 270,
+        "output": 19,
+        "thinking": 0
+      }
+    }
+  ],
+  "totals": {
+    "latency_ms": 4497,
+    "queue_ms": 0,
+    "tokens_in": 289,
+    "tokens_out": 19,
+    "cost_usd": 0.00013135,
+    "cost_by_stage": {
+      "retrieval": 0.0000028500000000000002,
+      "generation": 0.0001285,
+      "tools": 0
+    }
+  },
+  "status": "ok"
+}

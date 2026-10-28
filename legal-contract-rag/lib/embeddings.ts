@@ -1,4 +1,6 @@
 import { InferenceClient } from "@huggingface/inference";
+import { embeddingCost, estimateTokens } from "./pricing";
+import { span } from "./telemetry";
 
 /**
  * The embedding model.
@@ -103,16 +105,24 @@ async function embedWithGemini(
 }
 
 export async function createEmbedding(text: string): Promise<number[]> {
-  const hit = cache.get(text);
-  if (hit) return hit;
+  // Week 11: a span of the request, priced — a cache hit costs nothing and says so.
+  return span("retrieval.embed", "retrieval", async (handle) => {
+    const tokens = estimateTokens(text);
+    handle.set({ "gen_ai.request.model": EMBEDDING_LABEL, cache: cache.has(text) ? "hit" : "miss" });
 
-  const embedding =
-    PROVIDER === "gemini"
-      ? (await embedWithGemini([text]))[0]
-      : await embedWithHuggingFace(text);
+    const hit = cache.get(text);
+    if (hit) return hit;
 
-  cache.set(text, embedding);
-  return embedding;
+    const embedding =
+      PROVIDER === "gemini"
+        ? (await embedWithGemini([text]))[0]
+        : await embedWithHuggingFace(text);
+
+    handle.tokens({ input: tokens, output: 0, estimated: true });
+    handle.cost(embeddingCost(EMBEDDING_LABEL, tokens));
+    cache.set(text, embedding);
+    return embedding;
+  });
 }
 
 /**

@@ -7,6 +7,14 @@
  *   npm run eval -- --retrieval     retrieval assertions only, no answers at all
  *   npm run eval -- --validate      check the judge against the human labels
  *   npm run eval -- --label before  tag the saved run, for before/after deltas
+ *
+ * Week 11:
+ *   npm run eval -- --prompt rag-answer@1   pin the prompt version under test
+ *   npm run eval -- --compare week11-red    list every case whose verdict changed
+ *
+ * Answers now come from askQuestion — the same path production serves — so
+ * the suite grades exactly what a user would get under that prompt version,
+ * against the excerpts the model was actually shown.
  */
 import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "fs";
 import path from "path";
@@ -24,7 +32,8 @@ for (const file of [".env", ".env.local"]) {
 }
 
 const { searchDocuments } = await import("../lib/search");
-const { generateAnswer } = await import("../lib/rag");
+const { askQuestion } = await import("../lib/rag");
+const { getPrompt, DEFAULT_PROMPT_VERSION } = await import("../lib/prompts");
 const { runAssertions, goldRank, looksLikeRefusal } = await import("../lib/assertions");
 const { judgeAnswer, HUMAN_LABELS } = await import("../lib/judge");
 const { TEST_SET, PROBLEM_TYPES } = await import("../lib/test-set");
@@ -44,6 +53,8 @@ const mode = value("mode") === "vector" ? "vector" : "hybrid";
 const retrievalOnly = flag("retrieval");
 const useJudge = !flag("no-judge") && !retrievalOnly;
 const label = value("label") ?? "run";
+const prompt = getPrompt(value("prompt") ?? process.env.PROMPT_VERSION ?? DEFAULT_PROMPT_VERSION);
+const compareWith = value("compare");
 
 function percent(passed: number, total: number) {
   return total === 0 ? "n/a" : `${Math.round((passed / total) * 100)}%`;
@@ -84,14 +95,14 @@ async function main() {
   console.log(`  retrieval : ${mode}`);
   console.log(`  embeddings: ${EMBEDDING_LABEL}`);
   console.log(`  generator : ${retrievalOnly ? "(not called)" : resolveGenerator().label}`);
+  console.log(`  prompt    : ${prompt.id}`);
   console.log(`  cases     : ${TEST_SET.length}\n`);
 
   const results = [];
 
   for (const testCase of TEST_SET) {
-    const retrieved = await searchDocuments(testCase.question, 3, mode);
-
     if (retrievalOnly) {
+      const retrieved = await prompt.context(testCase.question, mode);
       const rank = testCase.gold.length ? goldRank(retrieved, testCase.gold) : null;
       const passed = testCase.gold.length === 0 ? true : rank !== null;
 
@@ -114,24 +125,33 @@ async function main() {
       continue;
     }
 
-    const answer = await generateAnswer(testCase.question, retrieved);
+    const asked = await askQuestion(testCase.question, mode, {
+      channel: "eval",
+      user: { id: "eval-suite", role: "eval" },
+      promptVersion: prompt.id,
+    });
+    const { answer, sources: retrieved, traceId } = asked;
     const assertions = runAssertions(testCase, retrieved, answer);
     const judgement = useJudge
-      ? await judgeAnswer(testCase.question, retrieved, answer)
+      ? await judgeAnswer(testCase.question, retrieved, answer, asked.context)
       : null;
 
     const assertionsPassed = assertions.every((a) => a.passed);
 
     // The judge can only fail a case, never rescue one the rules failed.
+    // Week 11: on a refusal case the rule already decides whether it refused;
+    // the judge only vetoes a refusal that asserts something unsupported. Its
+    // label for a refusal is not stable — gemini-3.5-flash-lite called the same
+    // "I don't know." "refused" on T10 and "supported" on T12 in one run.
     const judgeOk =
       !judgement ||
       (testCase.expectRefusal
-        ? judgement.verdict === "refused"
+        ? judgement.verdict !== "unsupported"
         : judgement.verdict === "supported" && judgement.answersQuestion);
 
     const passed = assertionsPassed && judgeOk;
 
-    results.push({ ...testCase, retrieved, answer, assertions, judgement, passed });
+    results.push({ ...testCase, retrieved, answer, assertions, judgement, passed, traceId });
 
     const failed = assertions.filter((a) => !a.passed).map((a) => a.name);
     console.log(
@@ -166,8 +186,25 @@ async function main() {
 
   const regressions = results.filter((r) => r.regression);
   console.log(
-    `  Regression tests (real past failures): ${regressions.filter((r) => r.passed).length}/${regressions.length} passing\n`,
+    `  Regression tests (real past failures): ${regressions.filter((r) => r.passed).length}/${regressions.length} passing`,
   );
+  const failing = results.filter((r) => !r.passed).map((r) => r.id);
+  console.log(`  Failing: ${failing.length ? failing.join(", ") : "none"}\n`);
+
+  if (compareWith) {
+    const previousFile = path.join(process.cwd(), "evals", `${compareWith}.json`);
+    const previous = JSON.parse(readFileSync(previousFile, "utf-8"));
+    const was = new Map<string, boolean>(previous.results.map((r: { id: string; passed: boolean }) => [r.id, r.passed]));
+    console.log(`  Against ${compareWith} (${previous.promptVersion ?? "?"}: ${previous.overall.passed}/${previous.overall.total}) → ${label} (${prompt.id}: ${totalPassed}/${results.length})\n`);
+    for (const result of results) {
+      const before = was.get(result.id);
+      const change =
+        before === undefined ? "new case" : before === result.passed ? "" : result.passed ? "FIXED" : "REGRESSED";
+      if (change) console.log(`  ${change.padEnd(10)} ${result.id}  ${result.question.slice(0, 60)}`);
+    }
+    const regressed = results.filter((r) => was.get(r.id) === true && !r.passed);
+    console.log(`\n  ${regressed.length ? `${regressed.length} case(s) REGRESSED` : "Nothing that passed before fails now."}\n`);
+  }
 
   const validation = flag("validate") ? await validateJudge() : null;
 
@@ -181,6 +218,7 @@ async function main() {
       {
         label,
         mode,
+        promptVersion: prompt.id,
         ranAt: new Date().toISOString(),
         embeddingModel: EMBEDDING_LABEL,
         generator: retrievalOnly ? null : resolveGenerator().label,

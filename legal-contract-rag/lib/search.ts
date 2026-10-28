@@ -1,7 +1,8 @@
 import { qdrant } from "./qdrant";
 import { createEmbedding } from "./embeddings";
-import { loadChunks } from "./chunking";
+import { loadChunks, type Chunk } from "./chunking";
 import { searchKeywords } from "./bm25";
+import { span } from "./telemetry";
 
 const COLLECTION_NAME = "legal_documents";
 
@@ -27,10 +28,15 @@ export interface SearchResult {
 async function vectorCandidates(query: string, limit: number) {
   const embedding = await createEmbedding(query);
 
-  const response = await qdrant.query(COLLECTION_NAME, {
-    query: embedding,
-    limit,
-    with_payload: true,
+  // Qdrant Cloud's free tier: no per-query price, so the span carries time only.
+  const response = await span("retrieval.vector", "retrieval", async (handle) => {
+    const result = await qdrant.query(COLLECTION_NAME, {
+      query: embedding,
+      limit,
+      with_payload: true,
+    });
+    handle.set({ "db.system": "qdrant", collection: COLLECTION_NAME, limit, returned: result.points.length });
+    return result;
   });
 
   return response.points.map((point) => ({
@@ -76,11 +82,27 @@ async function hybridSearch(
     vectorCandidates(query, candidateLimit).then((list) =>
       list.filter((candidate) => inScope(candidate.source)),
     ),
-    searchKeywords(query, candidateLimit).then((list) =>
-      list.filter((result) => inScope(result.chunk.source)),
-    ),
+    span("retrieval.keyword", "retrieval", async (handle) => {
+      const list = (await searchKeywords(query, candidateLimit)).filter((result) =>
+        inScope(result.chunk.source),
+      );
+      handle.set({ index: "bm25", limit: candidateLimit, returned: list.length });
+      return list;
+    }),
   ]);
 
+  return span("retrieval.fuse", "retrieval", (handle) => {
+    handle.set({ method: "rrf", k: RRF_K, ...(source ? { scope: source } : {}) });
+    return fuse(semantic, keyword, chunks, limit);
+  });
+}
+
+function fuse(
+  semantic: Awaited<ReturnType<typeof vectorCandidates>>,
+  keyword: Awaited<ReturnType<typeof searchKeywords>>,
+  chunks: Chunk[],
+  limit: number,
+): SearchResult[] {
   const byId = new Map(chunks.map((chunk) => [chunk.id, chunk]));
 
   const fused = new Map<

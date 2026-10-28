@@ -1,0 +1,78 @@
+$ GEMINI_MODEL=gemini-3.5-flash-lite npm run eval -- --prompt rag-answer@2 --label week11-green --compare week11-red --validate
+# run at 2026-10-28 12:09:57 IST — AFTER the fix (rag-answer@2); same suite, same judge, same model as week11-red
+
+Legal contract RAG — test set
+  retrieval : hybrid
+  embeddings: gemini:gemini-embedding-001
+  generator : gemini:gemini-3.5-flash-lite
+  prompt    : rag-answer@2
+  cases     : 17
+
+  PASS  T01  wrong-contract   What is the termination notice period in PC-2026-0
+  PASS  T02  wrong-contract   What is the match fee in PC-2026-027?
+  PASS  T03  wrong-contract   How many days before the first match must the play
+  PASS  T04  orphaned-clause  Where are disputes under Dinesh Mendis's player co
+  PASS  T05  orphaned-clause  What is the transfer fee under TRF-2026-008?
+  FAIL  T06  orphaned-clause  How is Rohan Sharma's retainer paid out across the
+         ↳ judge: unsupported — The answer states the retainer is paid in three equal instalments on specific dates based on excerpt [1], but that clause was replaced by excerpt [2], and the amendment does not mention the payment schedule.
+  PASS  T07  superseded-value What is Rohan Sharma's current annual retainer?
+  PASS  T08  superseded-value What is the current termination notice period for 
+  PASS  T09  superseded-value How much written notice is needed to terminate the
+  PASS  T10  unanswerable     What is the notice period to end the stadium agree
+  PASS  T11  unanswerable     Can Meridian Sports Network show matches in Austra
+  PASS  T12  unanswerable     What is the buyout clause in Rohan Sharma's contra
+  PASS  T13  straightforward  How many overseas players may appear in the playin
+  PASS  T14  straightforward  A player has just reached 8 demerit points. How ma
+  PASS  T15  straightforward  How quickly must a player report to doping control
+  PASS  T16  straightforward  What share of net ticket revenue does the club kee
+  PASS  T17  superseded-value How much notice does Rohan Sharma need to give to 
+
+  Score by problem type
+
+  problem type       passed   rate
+  --------------------------------------
+  wrong-contract     3/3      100%
+  orphaned-clause    2/3      67%
+  superseded-value   4/4      100%
+  unanswerable       3/3      100%
+  straightforward    4/4      100%
+  --------------------------------------
+  OVERALL            16/17    94%
+
+  Regression tests (real past failures): 6/6 passing
+  Failing: T06
+
+  Against week11-red (rag-answer@1: 14/17) → week11-green (rag-answer@2: 16/17)
+
+  FIXED      T01  What is the termination notice period in PC-2026-027?
+  FIXED      T02  What is the match fee in PC-2026-027?
+  REGRESSED  T06  How is Rohan Sharma's retainer paid out across the year?
+  FIXED      T17  How much notice does Rohan Sharma need to give to terminate 
+
+  1 case(s) REGRESSED
+
+
+Judge validation — does it agree with my own grading?
+
+  agree     W4-Q08       human=refused     judge=refused     
+  agree     W4-Q11       human=supported   judge=supported   
+  agree     W4-Q13       human=supported   judge=supported   
+  agree     W4-Q16       human=supported   judge=supported   
+  DISAGREE  W4-OLD-Q13   human=refused     judge=unsupported — judge said: The answer claims the excerpts do not mention AlphaTech, but excerpt [3] explicitly names AlphaTech Solutions, and the excerpts contain the termination notice period.
+  agree     W4-OLD-Q11   human=unsupported judge=unsupported 
+
+  agreement: 5/6 = 83%
+  Judge agrees closely enough with human grading to quote its scores.
+
+  saved → evals/week11-green.json
+
+  Delta vs after (hybrid retrieval → hybrid)
+
+  problem type       after    week11-green change
+  --------------------------------------------------
+  wrong-contract     1/3      3/3      improved
+  orphaned-clause    3/3      2/3      REGRESSED
+  superseded-value   3/3      4/4      same
+  unanswerable       3/3      3/3      same
+  straightforward    4/4      4/4      same
+

@@ -17,6 +17,8 @@ export interface Usage {
   inputTokens: number;
   /** Includes thinking tokens — they are billed as output. */
   outputTokens: number;
+  /** Week 11: the thinking share of outputTokens, where the provider reports it. */
+  thinkingTokens?: number;
 }
 
 /** A completion with what it cost, for the week 7 agent-vs-workflow race. */
@@ -25,6 +27,15 @@ export interface Completion {
   usage: Usage;
   /** Time in the provider call itself, excluding free-tier throttle waits. */
   ms: number;
+  /**
+   * Week 11: time spent queued behind the throttle and in retry backoff. It is
+   * zero on a quiet day and is the first thing a busier one turns into latency.
+   */
+  waitMs?: number;
+  /** Provider calls made, counting retries. */
+  attempts?: number;
+  /** How many of those attempts came back rate limited. */
+  throttled?: number;
 }
 
 export interface Generator {
@@ -91,13 +102,20 @@ function withRateLimiting(generator: Generator, intervalMs: number): Generator {
 
   return fromRun(generator.label, async (messages) => {
     let backoff = 5000;
+    let waitMs = 0;
+    let throttled = 0;
 
     for (let attempt = 1; ; attempt++) {
+      const queued = Date.now();
       await throttle();
+      waitMs += Date.now() - queued;
 
       try {
-        return await generator.run(messages);
+        const completion = await generator.run(messages);
+        return { ...completion, waitMs, attempts: attempt, throttled };
       } catch (error) {
+        if (error instanceof RateLimitError) throttled++;
+
         // A dropped connection is as temporary as a 429, and losing a whole
         // evaluation batch to one is worse than waiting a few seconds. So is
         // Gemini's 503 "experiencing high demand".
@@ -110,7 +128,9 @@ function withRateLimiting(generator: Generator, intervalMs: number): Generator {
 
         if (!transient || attempt >= MAX_ATTEMPTS) throw error;
 
-        await sleep(error instanceof RateLimitError ? (error.retryAfterMs ?? backoff) : backoff);
+        const delay = error instanceof RateLimitError ? (error.retryAfterMs ?? backoff) : backoff;
+        await sleep(delay);
+        waitMs += delay;
         backoff *= 2;
       }
     }
@@ -210,12 +230,18 @@ function gemini(apiKey: string, model: string): Generator {
     const body = await response.json().catch(() => ({}));
 
     if (response.status === 429) {
-      const retryInfo = body?.error?.details?.find((detail: { "@type"?: string }) =>
-        detail["@type"]?.includes("RetryInfo"),
-      );
+      const details: { "@type"?: string; retryDelay?: string; violations?: { quotaId?: string; quotaValue?: string }[] }[] =
+        body?.error?.details ?? [];
+      const retryInfo = details.find((detail) => detail["@type"]?.includes("RetryInfo"));
+      // Week 11: the quota that tripped, e.g. "...PerMinute...-FreeTier = 15" —
+      // the free-tier limits are not published anywhere else.
+      const quota = details
+        .find((detail) => detail["@type"]?.includes("QuotaFailure"))
+        ?.violations?.map((violation) => `${violation.quotaId} = ${violation.quotaValue}`)
+        .join("; ");
 
       throw new RateLimitError(
-        "Gemini rate limited",
+        quota ? `Gemini rate limited (${quota})` : "Gemini rate limited",
         parseDelay(retryInfo?.retryDelay),
       );
     }
@@ -247,6 +273,7 @@ function gemini(apiKey: string, model: string): Generator {
         inputTokens: usage.promptTokenCount ?? 0,
         outputTokens:
           (usage.candidatesTokenCount ?? 0) + (usage.thoughtsTokenCount ?? 0),
+        thinkingTokens: usage.thoughtsTokenCount ?? 0,
       },
       ms: Date.now() - started,
     };

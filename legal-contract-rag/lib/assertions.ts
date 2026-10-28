@@ -126,8 +126,9 @@ export function runAssertions(
   }
 
   // 5. Citations: present when answering, and pointing at real excerpts.
-  const cited = [...answer.matchAll(/\[(\d+)\]/g)].map((match) =>
-    Number(match[1]),
+  // "[1, 3]" is two citations, as much as "[1][3]" is.
+  const cited = [...answer.matchAll(/\[(\d+(?:\s*,\s*\d+)*)\]/g)].flatMap((match) =>
+    match[1].split(",").map((number) => Number(number.trim())),
   );
 
   if (!testCase.expectRefusal) {
@@ -135,6 +136,32 @@ export function runAssertions(
       name: "cites-a-source",
       passed: cited.length > 0,
       detail: cited.length > 0 ? `cited ${cited.length}` : "no citation",
+    });
+  }
+
+  // 6. Week 11: is the clause it cites the right one? [n] is retrieved[n-1].
+  const citedClauses = cited
+    .filter((number) => number >= 1 && number <= retrieved.length)
+    .map((number) => retrieved[number - 1]);
+  const describe = (result: SearchResult) => `${result.source} §${sectionNumber(result.section)}`;
+
+  if (testCase.citeGold) {
+    const hit = citedClauses.some((result) => isGold(result, testCase.gold));
+    results.push({
+      name: "cites-gold",
+      passed: hit,
+      detail: hit
+        ? "cites the clause that answers it"
+        : `cited ${citedClauses.map(describe).join(", ") || "nothing"} — not the gold clause`,
+    });
+  }
+
+  for (const banned of testCase.mustNotCite ?? []) {
+    const hit = citedClauses.some((result) => isGold(result, [banned]));
+    results.push({
+      name: `does-not-cite:${banned.source} §${banned.section}`,
+      passed: !hit,
+      detail: hit ? "cited a clause that cannot answer this question" : "not cited",
     });
   }
 

@@ -1,3 +1,6 @@
+import { readdirSync, readFileSync } from "fs";
+import path from "path";
+
 /**
  * The test set.
  *
@@ -48,10 +51,38 @@ export interface TestCase {
   expectRefusal?: boolean;
   /** A failure this app actually produced, pinned as a permanent test. */
   regression?: boolean;
+  /**
+   * Week 11: the answer must cite a gold clause by its excerpt number. Stating
+   * the right value is not enough when the complaint is that the wrong clause
+   * was cited — and a judge cannot see that, because a superseded clause does
+   * support its own old value.
+   */
+  citeGold?: boolean;
+  /** Week 11: clauses the answer must never cite, e.g. a sibling contract's. */
+  mustNotCite?: GoldChunk[];
+  /** Week 11: the production trace this case was cut from. */
+  fromTrace?: string;
   note: string;
 }
 
-export const TEST_SET: TestCase[] = [
+/**
+ * Week 11: production failures, one JSON file each in evals/cases/, added by
+ * the failure→test loop (`npm run logs -- to-case <trace>`). Read at load time,
+ * so adding a case is adding a file.
+ */
+function productionCases(): TestCase[] {
+  const directory = path.join(process.cwd(), "evals", "cases");
+  try {
+    return readdirSync(directory)
+      .filter((file) => file.endsWith(".json"))
+      .sort()
+      .map((file) => JSON.parse(readFileSync(path.join(directory, file), "utf-8")) as TestCase);
+  } catch {
+    return [];
+  }
+}
+
+const BASE_SET: TestCase[] = [
   // ---- wrong-contract -----------------------------------------------------
   {
     id: "T01",
@@ -201,3 +232,5 @@ export const TEST_SET: TestCase[] = [
     note: "Plain lookup with a competing 20 percent in the same sentence.",
   },
 ];
+
+export const TEST_SET: TestCase[] = [...BASE_SET, ...productionCases()];

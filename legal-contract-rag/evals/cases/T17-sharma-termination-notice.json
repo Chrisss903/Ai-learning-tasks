@@ -1,0 +1,38 @@
+{
+  "id": "T17",
+  "type": "superseded-value",
+  "question": "How much notice does Rohan Sharma need to give to terminate his contract?",
+  "gold": [
+    {
+      "source": "amendment-pc-2026-011-01.txt",
+      "section": "3"
+    }
+  ],
+  "answerMustInclude": [
+    "90 days"
+  ],
+  "citeGold": true,
+  "mustNotCite": [
+    {
+      "source": "player-contract-mendis.txt",
+      "section": "8"
+    }
+  ],
+  "regression": true,
+  "fromTrace": "bc2b2ed7c7159e527a4d37fd549d4cf2",
+  "note": "Week 11 drill (complaint: 'a lawyer said it cited the wrong clause on termination, maybe Thursday'). Asked by name, not contract id, so search fetched PC-2026-011 §8 (60 days, superseded) and Mendis's PC-2026-027 §8, never the amendment AMD-PC-011-01 §3 that made it 90 days. The answer cited the superseded clause. The judge cannot catch this: the clause it cited really does say 60 days.",
+  "observed": {
+    "ts": "2026-10-22T09:37:31.000Z",
+    "user": {
+      "id": "a.iyer",
+      "role": "lawyer"
+    },
+    "prompt_version": "rag-answer@1",
+    "context": [
+      "[1] PC-2026-011 §1",
+      "[2] PC-2026-027 §8",
+      "[3] PC-2026-011 §8"
+    ],
+    "answer": "Rohan Sharma needs to give 60 days written notice to terminate his contract [3]."
+  }
+}

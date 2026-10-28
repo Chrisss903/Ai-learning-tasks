@@ -13,7 +13,11 @@
     "race:squad": "tsx scripts/race.mts --contenders agent,squad",
     "trajectory": "tsx scripts/trajectory.mts",
     "attack": "tsx scripts/attack.mts",
-    "mcp:tools": "tsx scripts/mcp-tools.mts"
+    "mcp:tools": "tsx scripts/mcp-tools.mts",
+    "ask": "tsx scripts/ask.mts",
+    "traffic": "tsx scripts/traffic.mts",
+    "logs": "tsx scripts/logs.mts",
+    "replay": "tsx scripts/replay.mts"
   },
   "dependencies": {
     "@huggingface/inference": "^4.13.28",

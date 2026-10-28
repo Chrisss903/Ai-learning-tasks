@@ -1,0 +1,5 @@
+model gemini-3.5-flash-lite · 20 concurrent calls in 2664 ms · status counts {"200":17,"429":3}
+  #12 429 1031ms retry=40s quota=[GenerateRequestsPerMinutePerProjectPerModel-FreeTier=15] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/
+  #13 429 1047ms retry=40s quota=[GenerateRequestsPerMinutePerProjectPerModel-FreeTier=15] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/
+  #19 429 1023ms retry=40s quota=[GenerateRequestsPerMinutePerProjectPerModel-FreeTier=15] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/
+  200s: p50 1513 ms, max 2610 ms
