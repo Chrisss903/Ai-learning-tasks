@@ -1,0 +1,15 @@
+
+Capstone eval · gemini:gemini-3.5-flash-lite · 2 cases through the integrated agent
+
+  C03  FAIL  list_contracts → search_clauses → find_amendments → search_clauses → finish
+        ↳ refers-to-counsel: no referral
+  C04  ERROR Gemini returned no text (finishReason: MALFORMED_RESPONSE)
+
+  overall            0/2 = 0%
+  superseded-value   0/1 = 0%
+  undefined          0/1 = 0%
+  live amendment chain 0/1 = 0%
+  judgement→counsel    0/1 = 0%
+  indemnity / liability: 0 cases — the store has no such clauses (see EVAL-REPORT.md non-coverage)
+  mean cost / question $0.002477 · saved → evals/capstone-counsel-red.json
+

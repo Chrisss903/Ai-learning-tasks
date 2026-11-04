@@ -140,3 +140,44 @@ export async function resolveContracts(question: string): Promise<Contract[]> {
 
   return contracts.filter((contract) => matched.has(contract.id));
 }
+
+export interface DefinedTerm {
+  term: string;
+  definition: string;
+  contractId: string;
+  section: number;
+}
+
+/**
+ * Week 12: a defined term means what the contract says it means. Definitions
+ * are written `"Term" means …` (up to the next definition or the end of the
+ * section), so they are read out of the text itself — no model, and no
+ * ordinary-meaning fallback: a term the documents never define comes back empty.
+ */
+export async function resolveDefinedTerm(term: string, contractId?: string): Promise<DefinedTerm[]> {
+  const wanted = term.trim().replace(/^["“]|["”]$/g, "").toLowerCase();
+  if (!wanted) return [];
+
+  const contracts = await listContracts();
+  const scope = contractId ? contracts.filter((c) => c.id.toUpperCase() === contractId.trim().toUpperCase()) : contracts;
+  const found: DefinedTerm[] = [];
+
+  for (const contract of scope) {
+    for (const chunk of await sectionsOf(contract.source)) {
+      const body = chunk.text.split("\n").slice(1).join(" ").replace(/\s+/g, " ");
+      const pattern = /["“]([^"”]+)["”]\s+means\s+(.*?)(?=\s+["“][^"”]+["”]\s+means\s|$)/g;
+
+      for (const match of body.matchAll(pattern)) {
+        if (match[1].trim().toLowerCase() === wanted) {
+          found.push({
+            term: match[1].trim(),
+            definition: match[2].trim(),
+            contractId: contract.id,
+            section: sectionNumber(chunk.section) ?? 0,
+          });
+        }
+      }
+    }
+  }
+  return found;
+}

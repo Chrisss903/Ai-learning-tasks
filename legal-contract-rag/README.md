@@ -1,3 +1,22 @@
+# Contract Review Assistant — Week 12 capstone (Track F)
+
+One entry point, one command:
+
+```bash
+npm install
+# .env needs GEMINI_API_KEY, QDRANT_URL, QDRANT_API_KEY (see scripts/env.mts); first time: POST /api/qdrant/create-collection then /api/ingest
+export GEMINI_MODEL=gemini-3.5-flash-lite CONTRACT_REPO_TOKEN=local   # any non-empty token
+npm run capstone -- ask "How much notice must Rohan Sharma give to terminate?"
+npm run capstone -- eval --label full          # 22-case integrated suite
+npm run capstone -- trajectory                 # 12-case trajectory eval
+npm run capstone -- trace <trace_id>           # spans + MCP-side audit under one id
+npm run capstone -- agreement --label full     # judge vs YOUR hand labels
+```
+
+Evidence for the capstone is in [week12/](week12/): [EVAL-REPORT.md](week12/EVAL-REPORT.md), [ARCHITECTURE.md](week12/ARCHITECTURE.md), [SEAMS.md](week12/SEAMS.md), [WEAKNESSES.md](week12/WEAKNESSES.md), [DEMO.md](week12/DEMO.md), [FRESH-EYES.md](week12/FRESH-EYES.md) (not done).
+
+---
+
 A RAG app over a set of sample legal contracts — cricket contracts, which are
 ordinary legal agreements in a setting that is easy to reason about. Built for
 the AI Engineering League.

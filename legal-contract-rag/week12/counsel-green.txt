@@ -1,0 +1,16 @@
+
+Capstone eval · gemini:gemini-3.5-flash-lite · 2 cases through the integrated agent
+
+  C03  FAIL  list_contracts → search_clauses → find_amendments → finish
+        ↳ shipped-no-advice-language: standard,acceptable
+  C04  FAIL  list_contracts → search_clauses → find_amendments → finish
+        ↳ cites-a-clause: 0
+
+  overall            0/2 = 0%
+  superseded-value   0/1 = 0%
+  straightforward    0/1 = 0%
+  live amendment chain 0/1 = 0%
+  judgement→counsel    0/2 = 0%
+  indemnity / liability: 0 cases — the store has no such clauses (see EVAL-REPORT.md non-coverage)
+  mean cost / question $0.003879 · saved → evals/capstone-counsel-green.json
+

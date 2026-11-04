@@ -1,0 +1,40 @@
+
+Capstone eval · gemini:gemini-3.5-flash-lite · 22 cases through the integrated agent
+
+  T01  PASS  search_clauses → find_amendments → finish
+  T02  PASS  find_amendments → search_clauses → finish
+  T03  PASS  search_clauses → find_amendments → finish
+  T04  PASS  list_contracts → search_clauses → find_amendments → finish
+  T05  PASS  get_contract → finish
+  T06  PASS  list_contracts → search_clauses → get_amendment_chain → finish
+  T07  PASS  list_contracts → search_clauses → get_amendment_chain → finish
+  T08  PASS  search_clauses → find_amendments → finish
+  T09  PASS  list_contracts → search_clauses → find_amendments → finish
+  T10  PASS  list_contracts → search_clauses → search_clauses → find_amendments → get_contract → finish
+  T11  FAIL  list_contracts → search_clauses → find_amendments → finish
+        ↳ refused-as-expected: answered anyway
+  T12  PASS  list_contracts → search_clauses → find_amendments → search_clauses → finish
+  T13  PASS  list_contracts → search_clauses → finish
+  T14  PASS  list_contracts → search_clauses → finish
+  T15  PASS  list_contracts → search_clauses → finish
+  T16  PASS  list_contracts → search_clauses → get_amendment_chain → finish
+  T17  PASS  list_contracts → search_clauses → find_amendments → finish
+  C01  PASS  resolve_defined_term → finish
+  C02  FAIL  list_contracts → resolve_defined_term → finish
+        ↳ refused-as-expected: answered anyway
+  C03  PASS  list_contracts → search_clauses → get_amendment_chain → finish
+  C04  PASS  list_contracts → search_clauses → find_amendments → finish
+  C05  PASS  list_contracts → search_clauses → find_amendments → finish
+
+  overall            20/22 = 91%
+  wrong-contract     3/3 = 100%
+  orphaned-clause    3/3 = 100%
+  superseded-value   5/5 = 100%
+  unanswerable       2/4 = 50%
+  straightforward    7/7 = 100%
+  live amendment chain 5/5 = 100%
+  judgement→counsel    2/2 = 100%
+  indemnity / liability: 0 cases — the store has no such clauses (see EVAL-REPORT.md non-coverage)
+  mean cost / question $0.003096 · saved → evals/capstone-full.json
+
+done

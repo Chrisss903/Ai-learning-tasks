@@ -47,11 +47,19 @@ const REFUSAL_PATTERNS = [
   "not mentioned in",
   "unable to answer",
   "not provided in",
+  // Week 12: an undefined-term refusal ("Affiliate" is not defined) never says "I don't know".
+  "is not defined",
+  "not defined in",
+  "no document defines",
+  "does not define",
 ];
 
 export function looksLikeRefusal(answer: string): boolean {
   const haystack = normalise(answer);
-  return REFUSAL_PATTERNS.some((pattern) => haystack.includes(pattern));
+  return (
+    REFUSAL_PATTERNS.some((pattern) => haystack.includes(pattern)) ||
+    /\b(?:do|does|did) not (?:\w+ ){0,2}define\b|\bnot (?:been )?defined\b/.test(haystack)
+  );
 }
 
 /** 1-based rank of the gold chunk, or null if it is absent. */

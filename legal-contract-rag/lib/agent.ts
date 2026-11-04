@@ -9,6 +9,8 @@ import {
   type Defences,
 } from "./defences";
 import { resolveGenerator, type Usage } from "./generator";
+import { generationCost } from "./pricing";
+import { span } from "./telemetry";
 import { discoverTools, type DiscoveredTool, type InputSchema } from "./mcp-client";
 
 /**
@@ -166,6 +168,22 @@ export const LEAN_AGENT: AgentRole = {
     'In your final answer, put every citation in square brackets — [PC-2026-011 §6] — never a bare "PC-2026-011 §6" or "(PC-2026-011 §6)".',
   ],
   tools: ["list_contracts", "search_clauses", "read_section", "find_amendments"],
+};
+
+/**
+ * Week 12: the capstone role. The single agent plus the lookup-not-opinion
+ * rules the brief asks for. The prompt asks; lib/counsel-guard.ts enforces.
+ */
+export const CAPSTONE_AGENT: AgentRole = {
+  ...SINGLE_AGENT,
+  rules: [
+    ...SINGLE_AGENT.rules,
+    'Put every citation in square brackets — [PC-2026-011 §6] — and when an amendment is in force, cite the amendment AND the clause it changed.',
+    'When the answer turns on a capitalised defined term ("Season", "Match Fee", "Affiliate"), call resolve_defined_term and use that definition. If the documents do not define the term, say so — never use its ordinary meaning.',
+    'Resolve the chain: cite every document in it (the base clause AND each amendment), and give the amendment\'s effective date. Only cite a clause you have actually read with a tool in this run — call read_section for the base clause before citing it.',
+    'State governing law or venue when the clause you cite carries one.',
+    'You are a lookup tool, not an adviser. Never say a clause is standard, typical, acceptable, fair, favourable or fine, and never compare it to other contracts as a judgement. If asked for such a judgement, report what the documents say and say the judgement is for counsel.',
+  ],
 };
 
 const systemPrompt = (tools: DiscoveredTool[], role: AgentRole) => `${role.brief}
@@ -351,13 +369,19 @@ export async function runAgent(
     if (usage.inputTokens + usage.outputTokens >= limits.maxTokens) return finish("token-budget");
     if (Date.now() - started >= limits.maxMs) return finish("time-budget");
 
-    const completion = await generator.run([
-      {
-        role: "system",
-        content: defences.sanitiseDocuments ? `${prompt}\n\n${DATA_RULE}` : prompt,
-      },
-      { role: "user", content: renderTranscript(question, steps) },
-    ]);
+    const completion = await span(`llm.step-${steps.length + 1}`, "generation", async (handle) => {
+      const result = await generator.run([
+        {
+          role: "system",
+          content: defences.sanitiseDocuments ? `${prompt}\n\n${DATA_RULE}` : prompt,
+        },
+        { role: "user", content: renderTranscript(question, steps) },
+      ]);
+      handle.tokens({ input: result.usage.inputTokens, output: result.usage.outputTokens });
+      handle.cost(generationCost(generator.label, result.usage));
+      handle.set({ model: generator.label, model_ms: result.ms });
+      return result;
+    });
 
     usage.inputTokens += completion.usage.inputTokens;
     usage.outputTokens += completion.usage.outputTokens;
@@ -431,7 +455,12 @@ export async function runAgent(
     }
 
     const toolStarted = Date.now();
-    const result = await tool.call(parsed.input);
+    const result = await span(`tool.${tool.name}`, "tools", async (handle) => {
+      handle.set({ server: tool.server, input: parsed.input });
+      const outcome = await tool.call(parsed.input);
+      handle.set({ is_error: outcome.isError, bytes: outcome.text.length });
+      return outcome;
+    });
     const toolMs = Date.now() - toolStarted;
     activeMs += toolMs;
 

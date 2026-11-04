@@ -1,0 +1,18 @@
+
+Capstone eval · gemini:gemini-3.5-flash-lite · 5 cases through the integrated agent
+
+  B01  PASS  list_contracts → search_clauses → get_amendment_chain → finish
+  B02  PASS  list_contracts → search_clauses → find_amendments → get_effective_date → finish
+  B03  PASS  get_amendment_chain → read_section → finish
+  B04  PASS  list_contracts → search_clauses → find_amendments → finish
+  B05  PASS  get_effective_date → search_clauses → finish
+
+  overall            5/5 = 100%
+  superseded-value   4/4 = 100%
+  straightforward    1/1 = 100%
+  live amendment chain 4/4 = 100%
+  judgement→counsel    n/a (0 cases)
+  indemnity / liability: 0 cases — the store has no such clauses (see EVAL-REPORT.md non-coverage)
+  mean cost / question $0.003612 · saved → evals/capstone-bonus-green.json
+
+done

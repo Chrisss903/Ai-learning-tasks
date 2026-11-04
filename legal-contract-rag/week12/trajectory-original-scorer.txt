@@ -1,0 +1,42 @@
+
+Trajectory eval · gemini:gemini-3.5-flash-lite · defences OFF
+  12 cases
+
+  T01  ERROR  Gemini returned no text (finishReason: MALFORMED_RESPONSE)
+  T02  answer OK   path OK 
+        search_clauses → find_amendments → finish
+  T04  answer OK   path OK 
+        list_contracts → search_clauses → find_amendments → finish
+  T05  answer OK   path OK 
+        get_contract → finish
+  T07  answer OK   path BAD  ← GAP
+        list_contracts → search_clauses → get_amendment_chain → finish
+        ↳ path: checked-amendments: never checked PC-2026-011
+  T08  answer OK   path OK 
+        search_clauses → find_amendments → finish
+  T09  answer OK   path OK 
+        list_contracts → search_clauses → find_amendments → finish
+  T10  answer OK   path OK 
+        list_contracts → search_clauses → search_clauses → get_contract → finish
+  T12  answer OK   path OK 
+        list_contracts → search_clauses → find_amendments → search_clauses → finish
+  T13  answer OK   path OK 
+        list_contracts → search_clauses → finish
+  M01  answer OK   path OK 
+        list_contracts → search_clauses → find_amendments → search_clauses → find_amendments → finish
+  M03  answer OK   path BAD  ← GAP
+        list_contracts → get_amendment_chain → finish
+        ↳ path: checked-amendments: never checked PC-2026-011
+
+  outcome pass    11/11 = 100%
+  trajectory pass 9/11 = 82%
+  right answer, wrong path: 2/11 — T07, M03
+  tool-choice accuracy 100%
+  cost per task: mean $0.00488, p99 $0.00887
+
+  path failures by kind
+    checked-amendments   2
+
+  saved → evals/trajectory-capstone.json
+
+done

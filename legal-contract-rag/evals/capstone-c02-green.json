@@ -1,0 +1,28 @@
+{
+  "label": "c02-green",
+  "ranAt": "2026-11-04T06:22:52.953Z",
+  "model": "gemini:gemini-3.5-flash-lite",
+  "rows": [
+    {
+      "id": "C02",
+      "group": "capstone",
+      "type": "unanswerable",
+      "question": "What does \"Affiliate\" mean under the franchise agreement?",
+      "traceId": "527b1c202c6661c46c5e06164eba26a9",
+      "answer": "The documents do not define the term \"Affiliate\" for the franchise agreement (FA-2025-003). Therefore, I cannot provide a definition based on the document store, and this question is for counsel.",
+      "draft": null,
+      "passed": false,
+      "failures": [
+        "refused-as-expected: answered anyway"
+      ],
+      "judgement": null,
+      "path": "list_contracts → resolve_defined_term → finish",
+      "llmCalls": 3,
+      "tokens": 5852,
+      "costUsd": 0.002288,
+      "latencyMs": 16242,
+      "amendmentChain": false,
+      "counsel": false
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "label": "counsel-green",
+  "ranAt": "2026-11-04T06:08:29.729Z",
+  "model": "gemini:gemini-3.5-flash-lite",
+  "rows": [
+    {
+      "id": "C03",
+      "group": "capstone",
+      "type": "superseded-value",
+      "question": "Is the 90-day termination notice in Rohan Sharma's contract standard?",
+      "traceId": "3aa07b1c36e2d44d2a9c17b6e2c4830a",
+      "answer": "Under Rohan Sharma's Player Registration and Services Contract (PC-2026-011 §8), the termination notice period was originally 60 days. However, pursuant to Amendment Number One ([AMD-PC-011-01 §3] modifying [PC-2026-011 §8]), the termination notice period has been replaced with a 90-day notice period. That judgement is for counsel.\n\nI can tell you what the documents say, not whether it is standard, acceptable or advisable — that is a judgement for counsel. Please refer this question to the legal team.",
+      "draft": "Under Rohan Sharma's Player Registration and Services Contract (PC-2026-011 §8), the termination notice period was originally 60 days. However, pursuant to Amendment Number One ([AMD-PC-011-01 §3] modifying [PC-2026-011 §8]), the termination notice period has been replaced with a 90-day notice period. \n\nAs a research agent, I am a lookup tool and not an adviser; I cannot judge whether a 90-day termination notice is standard. That judgement is for counsel.",
+      "passed": false,
+      "failures": [
+        "shipped-no-advice-language: standard,acceptable"
+      ],
+      "judgement": {
+        "verdict": "supported",
+        "answersQuestion": false,
+        "reason": "The answer correctly cites the contract excerpts regarding the 90-day notice period but evasively declines to answer whether it is standard."
+      },
+      "path": "list_contracts → search_clauses → find_amendments → finish",
+      "llmCalls": 4,
+      "tokens": 9420,
+      "costUsd": 0.004278,
+      "latencyMs": 27757,
+      "amendmentChain": true,
+      "counsel": true
+    },
+    {
+      "id": "C04",
+      "group": "capstone",
+      "type": "straightforward",
+      "question": "Should we accept the 30-day termination notice in Dinesh Mendis's contract?",
+      "traceId": "8a532793921c61c14ba8ebbde56bc1ee",
+      "answer": "Dinesh Mendis's contract (PC-2026-027 §8) specifies that either party may terminate the contract by giving 30 days written notice. There are no amendments modifying this provision [PC-2026-027]. Whether the franchise should accept this 30-day termination notice is a matter for counsel to judge, as I am a lookup tool and cannot provide advice or value judgments.",
+      "draft": null,
+      "passed": false,
+      "failures": [
+        "cites-a-clause: 0"
+      ],
+      "judgement": {
+        "verdict": "supported",
+        "answersQuestion": true,
+        "reason": "The answer correctly cites the contract provision allowing 30-day termination and declines to give a legal judgment, matching the excerpts."
+      },
+      "path": "list_contracts → search_clauses → find_amendments → finish",
+      "llmCalls": 4,
+      "tokens": 8579,
+      "costUsd": 0.0034801,
+      "latencyMs": 26323,
+      "amendmentChain": false,
+      "counsel": true
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "label": "bonus-green",
+  "ranAt": "2026-11-04T07:41:30.996Z",
+  "model": "gemini:gemini-3.5-flash-lite",
+  "rows": [
+    {
+      "id": "B01",
+      "group": "bonus",
+      "type": "superseded-value",
+      "question": "What is Rohan Sharma's current termination notice period, and when did the change take effect?",
+      "traceId": "b3b044f9c52b39b0a389d8df8f35d0c7",
+      "answer": "Rohan Sharma's current termination notice period is 90 days [PC-2026-011 §8; AMD-PC-011-01 §3], and this change took effect on 1 January 2026 [AMD-PC-011-01 §4].",
+      "draft": null,
+      "passed": true,
+      "failures": [],
+      "judgement": {
+        "verdict": "supported",
+        "answersQuestion": true,
+        "reason": "The answer correctly states Rohan Sharma's notice period is 90 days and the effective date is 1 January 2026, both of which are directly supported by the contract excerpts."
+      },
+      "path": "list_contracts → search_clauses → get_amendment_chain → finish",
+      "llmCalls": 4,
+      "tokens": 9323,
+      "costUsd": 0.0037649000000000003,
+      "latencyMs": 31883,
+      "amendmentChain": true,
+      "counsel": false
+    },
+    {
+      "id": "B02",
+      "group": "bonus",
+      "type": "superseded-value",
+      "question": "What notice must be given to terminate the AlphaTech service agreement, and from what date does that apply?",
+      "traceId": "e7be6838a6d08f40b47e170187698879",
+      "answer": "To terminate the AlphaTech service agreement (SA-2026-001), either party must provide 60 days written notice [SA-2026-001 §5, AMD-2026-001 §2]. \n\nThe original agreement took effect on August 1, 2026 [SA-2026-001 §2] with a 30-day notice period [SA-2026-001 §5], but the updated 60-day termination notice requirement applies as of October 1, 2026, the effective date of Amendment Number One [AMD-2026-001 §2, AMD-2026-001 §3].",
+      "draft": null,
+      "passed": true,
+      "failures": [],
+      "judgement": {
+        "verdict": "supported",
+        "answersQuestion": true,
+        "reason": "The answer correctly identifies the 60-day notice requirement and the effective dates for the agreement and the amendment based directly on the provided text."
+      },
+      "path": "list_contracts → search_clauses → find_amendments → get_effective_date → finish",
+      "llmCalls": 5,
+      "tokens": 12326,
+      "costUsd": 0.005361,
+      "latencyMs": 39925,
+      "amendmentChain": true,
+      "counsel": false
+    },
+    {
+      "id": "B03",
+      "group": "bonus",
+      "type": "superseded-value",
+      "question": "If Rohan Sharma's contract PC-2026-011 and its amendment conflict, which controls, and does that change his Match Fee?",
+      "traceId": "91b6260b66741c9b61210414cd96ba60",
+      "answer": "If Rohan Sharma's contract PC-2026-011 and its amendment conflict, the amendment controls for the sections it amends, as stated in [AMD-PC-011-01 §6]. However, this does not change his Match Fee; the amendment explicitly states that the Match Fee of 150,000 Indian rupees in Section 5 remains unchanged [PC-2026-011 §5, AMD-PC-011-01 §5].",
+      "draft": null,
+      "passed": true,
+      "failures": [],
+      "judgement": {
+        "verdict": "supported",
+        "answersQuestion": true,
+        "reason": "The answer correctly states that the amendment controls for the sections it amends and that the Match Fee remains unchanged, supported directly by the excerpts."
+      },
+      "path": "get_amendment_chain → read_section → finish",
+      "llmCalls": 3,
+      "tokens": 6349,
+      "costUsd": 0.0031873,
+      "latencyMs": 14432,
+      "amendmentChain": true,
+      "counsel": false
+    },
+    {
+      "id": "B04",
+      "group": "bonus",
+      "type": "superseded-value",
+      "question": "What was the AlphaTech service agreement's termination notice before the amendment, and what replaced it?",
+      "traceId": "af177ddf0578fd24aee0b76ed1e13cc1",
+      "answer": "Before the amendment, the AlphaTech service agreement's termination notice was 30 days written notice, as set out in [SA-2026-001 §5]. This was replaced by [AMD-2026-001 §2], which changed the termination notice period to 60 days written notice.",
+      "draft": null,
+      "passed": true,
+      "failures": [],
+      "judgement": {
+        "verdict": "supported",
+        "answersQuestion": true,
+        "reason": "The answer correctly identifies the original 30-day termination notice and the 60-day replacement from the provided contract excerpts."
+      },
+      "path": "list_contracts → search_clauses → find_amendments → finish",
+      "llmCalls": 4,
+      "tokens": 8943,
+      "costUsd": 0.0035277,
+      "latencyMs": 26653,
+      "amendmentChain": true,
+      "counsel": false
+    },
+    {
+      "id": "B05",
+      "group": "bonus",
+      "type": "straightforward",
+      "question": "Which law governs the AlphaTech service agreement SA-2026-001, and from what date is it effective?",
+      "traceId": "aa335a09f50c328ef6e34229f0c48a7b",
+      "answer": "The AlphaTech service agreement SA-2026-001 is governed by the applicable laws of India [SA-2026-001 §8], and it is effective from August 1, 2026 [SA-2026-001 §2].",
+      "draft": null,
+      "passed": true,
+      "failures": [],
+      "judgement": {
+        "verdict": "supported",
+        "answersQuestion": true,
+        "reason": "The answer accurately identifies both the governing law (laws of India) and the effective date (August 1, 2026) based directly on the provided excerpts."
+      },
+      "path": "get_effective_date → search_clauses → finish",
+      "llmCalls": 3,
+      "tokens": 5257,
+      "costUsd": 0.0022195,
+      "latencyMs": 23965,
+      "amendmentChain": false,
+      "counsel": false
+    }
+  ]
+}

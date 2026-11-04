@@ -98,7 +98,8 @@ export function scoreTrajectory(
   if (expectation.mustCheckAmendments.length) {
     const checked = new Set(
       toolCalls
-        .filter((step) => step.action === "find_amendments")
+        // Week 12: two servers now offer an amendment lookup; either one is the check.
+        .filter((step) => step.action === "find_amendments" || step.action === "get_amendment_chain")
         .map(contractIdOf)
         .filter((id): id is string => Boolean(id)),
     );

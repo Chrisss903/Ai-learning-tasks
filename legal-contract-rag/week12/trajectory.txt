@@ -1,0 +1,42 @@
+
+Trajectory eval · gemini:gemini-3.5-flash-lite · defences OFF
+  12 cases
+
+  T01  answer OK   path OK 
+        search_clauses → find_amendments → finish
+  T02  answer OK   path OK 
+        search_clauses → find_amendments → finish
+  T04  answer OK   path OK 
+        list_contracts → search_clauses → find_amendments → finish
+  T05  answer OK   path OK 
+        get_contract → finish
+  T07  answer OK   path OK 
+        list_contracts → search_clauses → get_amendment_chain → finish
+  T08  answer OK   path OK 
+        search_clauses → find_amendments → finish
+  T09  answer OK   path OK 
+        list_contracts → search_clauses → find_amendments → finish
+  T10  answer OK   path BAD  ← GAP
+        list_contracts → search_clauses → search_clauses → search_clauses → search_clauses → find_amendments → finish
+        ↳ path: no-wasted-steps: 7 steps (sensible ≤ 5)
+  T12  answer OK   path OK 
+        list_contracts → search_clauses → find_amendments → finish
+  T13  answer OK   path OK 
+        list_contracts → search_clauses → get_amendment_chain → finish
+  M01  answer OK   path OK 
+        list_contracts → search_clauses → find_amendments → search_clauses → find_amendments → finish
+  M03  answer OK   path OK 
+        list_contracts → search_clauses → find_amendments → finish
+
+  outcome pass    12/12 = 100%
+  trajectory pass 11/12 = 92%
+  right answer, wrong path: 1/12 — T10
+  tool-choice accuracy 100%
+  cost per task: mean $0.00503, p99 $0.00952
+
+  path failures by kind
+    no-wasted-steps      1
+
+  saved → evals/trajectory-capstone.json
+
+done

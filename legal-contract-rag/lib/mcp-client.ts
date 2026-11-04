@@ -7,6 +7,7 @@ import {
 } from "@modelcontextprotocol/sdk/client/stdio.js";
 import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import type { Tool as ToolDefinition } from "@modelcontextprotocol/sdk/types.js";
+import { currentTrace } from "./telemetry";
 
 /**
  * Week 9: the agent's side of MCP — the client, running inside the host.
@@ -161,7 +162,14 @@ async function callTool(
   args: Record<string, unknown>,
 ): Promise<ToolOutcome> {
   try {
-    const result = await client.callTool({ name, arguments: args });
+    // Week 12: the trace id rides in the request's _meta, so the server's own
+    // log line for this call carries the same id as the host's trace.
+    const trace = currentTrace();
+    const result = await client.callTool({
+      name,
+      arguments: args,
+      ...(trace ? { _meta: { trace_id: trace.traceId, parent_span_id: trace.spanId } } : {}),
+    });
     const content = (Array.isArray(result.content) ? result.content : []) as {
       type: string;
       text?: string;

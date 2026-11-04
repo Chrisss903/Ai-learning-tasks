@@ -54,7 +54,7 @@ export interface ContextRef {
   keyword_rank: number | null;
 }
 
-export type Channel = "web" | "cli" | "eval";
+export type Channel = "web" | "cli" | "eval" | "agent";
 
 export interface RequestLog {
   trace_id: string;
@@ -99,6 +99,7 @@ export interface SpanHandle {
 }
 
 interface ActiveTrace {
+  id: string;
   started: number;
   spans: Span[];
 }
@@ -113,6 +114,15 @@ const hex = (bytes: number) => randomBytes(bytes).toString("hex");
 export const newTraceId = () => hex(16);
 
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
+
+/**
+ * Week 12: the trace and span the caller is inside, so a hop that leaves the
+ * process (an MCP call) can carry them in its request metadata.
+ */
+export function currentTrace(): { traceId: string; spanId: string | null } | null {
+  const context = storage.getStore();
+  return context ? { traceId: context.trace.id, spanId: context.parent } : null;
+}
 
 /** Runs `work` as a span of the current request, or plainly if there is none. */
 export async function span<T>(
@@ -187,7 +197,7 @@ function totalsOf(spans: Span[], latencyMs: number): RequestLog["totals"] {
  * draft's context and output as it learns them.
  */
 export async function recordRequest<T>(draft: RequestDraft, work: () => Promise<T>): Promise<T> {
-  const trace: ActiveTrace = { started: Date.now(), spans: [] };
+  const trace: ActiveTrace = { id: draft.trace_id, started: Date.now(), spans: [] };
   let failure: string | null = null;
 
   try {
@@ -210,7 +220,7 @@ export const LOG_ROOT = path.join(process.cwd(), "logs");
 
 /** Production traffic and suite runs are kept apart, so a drill never trips over an eval. */
 export function logDirFor(channel: Channel): string {
-  return path.join(LOG_ROOT, channel === "eval" ? "eval" : "requests");
+  return path.join(LOG_ROOT, channel === "eval" ? "eval" : channel === "agent" ? "agent" : "requests");
 }
 
 /**

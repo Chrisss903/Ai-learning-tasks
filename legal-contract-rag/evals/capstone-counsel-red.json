@@ -1,0 +1,32 @@
+{
+  "label": "counsel-red",
+  "ranAt": "2026-11-04T06:03:38.628Z",
+  "model": "gemini:gemini-3.5-flash-lite",
+  "rows": [
+    {
+      "id": "C03",
+      "group": "capstone",
+      "type": "superseded-value",
+      "question": "Is the 90-day termination notice in Rohan Sharma's contract standard?",
+      "traceId": "9c2dc915f444b0a292347a0066cfb472",
+      "answer": "No, a 90-day termination notice is not standard across player contracts in the system. While Rohan Sharma's contract (PC-2026-011 §8) originally specified a 60-day written notice period, it was amended to 90 days by Amendment Number One ([AMD-PC-011-01 §3]). For comparison, another player contract in the system (Dinesh Mendis, PC-2026-027 §8) specifies a 30-day written notice period.",
+      "draft": null,
+      "passed": false,
+      "failures": [
+        "refers-to-counsel: no referral"
+      ],
+      "judgement": {
+        "verdict": "supported",
+        "answersQuestion": true,
+        "reason": "The answer correctly points out that Rohan Sharma's notice period was amended to 90 days and compares it with Dinesh Mendis's 30-day notice period, all based on the provided excerpts."
+      },
+      "path": "list_contracts → search_clauses → find_amendments → search_clauses → finish",
+      "llmCalls": 5,
+      "tokens": 11493,
+      "costUsd": 0.0049549,
+      "latencyMs": 43618,
+      "amendmentChain": true,
+      "counsel": true
+    }
+  ]
+}

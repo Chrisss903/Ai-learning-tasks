@@ -12,6 +12,8 @@ import "../../scripts/env.mts";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import { appendFileSync, mkdirSync } from "node:fs";
+import path from "node:path";
 
 // stdout is the protocol channel. One stray console.log from a library would
 // corrupt the stream, so everything printed goes to stderr.
@@ -22,7 +24,7 @@ console.warn = console.error;
 // Imported after the environment is loaded: lib modules read it when they load.
 const { searchDocuments } = await import("../../lib/search");
 const { searchKeywords } = await import("../../lib/bm25");
-const { findAmendments, findContract, listContracts, readSection, sectionsOf } = await import(
+const { findAmendments, findContract, listContracts, readSection, resolveDefinedTerm, sectionsOf } = await import(
   "../../lib/contracts"
 );
 const { formatClause } = await import("../../lib/tools");
@@ -206,4 +208,80 @@ server.registerTool(
   },
 );
 
-await server.connect(new StdioServerTransport());
+server.registerTool(
+  "resolve_defined_term",
+  {
+    title: "Resolve a defined term",
+    description:
+      'Returns what a contract defines a capitalised term to mean (e.g. "Season", "Match Fee", "Franchise Activity"), cited [CONTRACT-ID §N]. ' +
+      "Call it whenever your answer turns on such a term, and use the definition, never the ordinary meaning of the word. " +
+      "If it returns nothing, the documents do not define the term: say so, do not guess.",
+    inputSchema: {
+      term: z.string().describe('The term as capitalised in the contract, e.g. "Match Fee".'),
+      contract_id: z.string().optional().describe("Scope to one contract. Omit to see every contract's definition — they can differ."),
+    },
+    annotations: { readOnlyHint: true },
+  },
+  async ({ term, contract_id }) => {
+    if (contract_id?.trim() && !(await findContract(contract_id))) return unknownContract(contract_id);
+    const found = await resolveDefinedTerm(term, contract_id);
+    if (!found.length) {
+      return reply(`No document defines "${term}". Do not assume its ordinary meaning; say the term is undefined in the store and refer the question to counsel.`);
+    }
+    return reply(found.map((d) => `[${d.contractId} §${d.section}] "${d.term}" means ${d.definition}`).join("\n"));
+  },
+);
+
+// Week 12 — the privilege line. This server answers clients the host does not
+// control, so personal contact details are masked on the way out. (The store
+// has none today; the filter is the guard for the day it does.)
+const MASKS: [RegExp, string][] = [
+  [/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g, "[email redacted]"],
+  [/\+\d[\d\s().-]{8,}\d|\b\d{10,}\b/g, "[number redacted]"],
+];
+export function redact(text: string): string {
+  return process.env.MCP_REDACT === "off" ? text : MASKS.reduce((out, [pattern, label]) => out.replace(pattern, label), text);
+}
+
+const transport = new StdioServerTransport();
+await server.connect(transport);
+
+// Week 12 — one audit line per tools/call, keyed by the caller's trace id (it
+// arrives in the request's _meta). Only the tool name, contract scope, timing
+// and size are logged: never the query text or what was returned.
+const audit = path.join(process.cwd(), "logs", "mcp");
+const pending = new Map<string | number, { at: number; line: Record<string, unknown> }>();
+const received = transport.onmessage;
+transport.onmessage = (message) => {
+  const request = message as { id?: string | number; method?: string; params?: { name?: string; arguments?: Record<string, unknown>; _meta?: Record<string, unknown> } };
+  if (request.method === "tools/call" && request.id !== undefined) {
+    pending.set(request.id, {
+      at: Date.now(),
+      line: {
+        ts: new Date().toISOString(),
+        trace_id: request.params?._meta?.trace_id ?? null,
+        parent_span_id: request.params?._meta?.parent_span_id ?? null,
+        server: "clause-search",
+        tool: request.params?.name,
+        contract_id: request.params?.arguments?.contract_id ?? null,
+      },
+    });
+  }
+  received?.(message);
+};
+const sent = transport.send.bind(transport);
+transport.send = async (message) => {
+  const response = message as { id?: string | number; result?: { content?: { text?: string }[]; isError?: boolean } };
+  const entry = response.id !== undefined ? pending.get(response.id) : undefined;
+  if (entry && response.result) {
+    pending.delete(response.id!);
+    const content = response.result.content ?? [];
+    for (const part of content) if (part.text) part.text = redact(part.text);
+    mkdirSync(audit, { recursive: true });
+    appendFileSync(
+      path.join(audit, `${new Date().toISOString().slice(0, 10)}.jsonl`),
+      `${JSON.stringify({ ...entry.line, duration_ms: Date.now() - entry.at, bytes: content.reduce((n, p) => n + (p.text?.length ?? 0), 0), is_error: Boolean(response.result.isError) })}\n`,
+    );
+  }
+  return sent(message);
+};

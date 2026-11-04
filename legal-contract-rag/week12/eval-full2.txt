@@ -1,0 +1,44 @@
+
+Capstone eval · gemini:gemini-3.5-flash-lite · 27 cases through the integrated agent
+
+  T01  PASS  search_clauses → find_amendments → finish
+  T02  PASS  search_clauses → find_amendments → finish
+  T03  PASS  search_clauses → find_amendments → finish
+  T04  PASS  list_contracts → search_clauses → find_amendments → finish
+  T05  PASS  get_contract → finish
+  T06  PASS  list_contracts → search_clauses → get_amendment_chain → read_section → finish
+  T07  PASS  list_contracts → search_clauses → get_amendment_chain → finish
+  T08  PASS  search_clauses → find_amendments → finish
+  T09  PASS  list_contracts → search_clauses → find_amendments → finish
+  T10  FAIL  list_contracts → search_clauses → search_clauses → search_clauses → read_section → read_section → read_section → (invalid reply)
+        ↳ refused-as-expected: answered anyway
+  T11  PASS  list_contracts → search_clauses → read_section → search_clauses → search_clauses → get_contract → find_amendments → finish
+  T12  PASS  list_contracts → search_clauses → find_amendments → search_clauses → finish
+  T13  PASS  list_contracts → search_clauses → find_amendments → finish
+  T14  PASS  list_contracts → search_clauses → finish
+  T15  PASS  list_contracts → search_clauses → finish
+  T16  PASS  list_contracts → search_clauses → find_amendments → finish
+  T17  PASS  list_contracts → search_clauses → find_amendments → finish
+  C01  PASS  resolve_defined_term → finish
+  C02  PASS  list_contracts → resolve_defined_term → finish
+  C03  PASS  list_contracts → search_clauses → find_amendments → finish
+  C04  PASS  list_contracts → search_clauses → get_amendment_chain → finish
+  C05  PASS  list_contracts → search_clauses → find_amendments → read_section → finish
+  B01  PASS  list_contracts → search_clauses → get_amendment_chain → finish
+  B02  PASS  list_contracts → search_clauses → find_amendments → finish
+  B03  PASS  get_contract → get_amendment_chain → finish
+  B04  PASS  list_contracts → search_clauses → find_amendments → finish
+  B05  PASS  search_clauses → get_effective_date → finish
+
+  overall            26/27 = 96%
+  wrong-contract     3/3 = 100%
+  orphaned-clause    3/3 = 100%
+  superseded-value   9/9 = 100%
+  unanswerable       3/4 = 75%
+  straightforward    8/8 = 100%
+  live amendment chain 9/9 = 100%
+  judgement→counsel    2/2 = 100%
+  indemnity / liability: 0 cases — the store has no such clauses (see EVAL-REPORT.md non-coverage)
+  mean cost / question $0.003551 · saved → evals/capstone-full2.json
+
+done

@@ -1,0 +1,13 @@
+
+Capstone eval · gemini:gemini-3.5-flash-lite · 1 cases through the integrated agent
+
+  C02  FAIL  list_contracts → resolve_defined_term → finish
+        ↳ refused-as-expected: answered anyway
+
+  overall            0/1 = 0%
+  unanswerable       0/1 = 0%
+  live amendment chain n/a (0 cases)
+  judgement→counsel    n/a (0 cases)
+  indemnity / liability: 0 cases — the store has no such clauses (see EVAL-REPORT.md non-coverage)
+  mean cost / question $0.002288 · saved → evals/capstone-c02-green.json
+

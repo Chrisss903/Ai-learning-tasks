@@ -17,7 +17,8 @@
     "ask": "tsx scripts/ask.mts",
     "traffic": "tsx scripts/traffic.mts",
     "logs": "tsx scripts/logs.mts",
-    "replay": "tsx scripts/replay.mts"
+    "replay": "tsx scripts/replay.mts",
+    "capstone": "tsx scripts/capstone.mts"
   },
   "dependencies": {
     "@huggingface/inference": "^4.13.28",
